@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace WeatherApp.Utils
+﻿namespace WeatherApp.Utils
 {
     /// <summary>
     /// This class contains helper methods that generate OData filters
@@ -11,9 +6,7 @@ namespace WeatherApp.Utils
     /// </summary>
     public class FilterHelper
     {
-        private static DateTime _defaultDate = DateTime.MinValue;
-
-        public static string GenerateFilter(string filter = "", string value = null, bool isFirst = false)
+        public static string GenerateFilter(string filter = "", string? value = null, bool isFirst = false)
         {
             if (string.IsNullOrEmpty(filter) || string.IsNullOrEmpty(value))
             {
@@ -50,7 +43,7 @@ namespace WeatherApp.Utils
         }
 
         // Handle lists. Use above basic methods to generate filters for each item in the list
-        public static string GenerateFilter(string filter = "", List<string> values = null, bool isFirst = false)
+        public static string GenerateFilter(string filter = "", List<string>? values = null, bool isFirst = false)
         {
             if (string.IsNullOrEmpty(filter) || values == null || values.Count == 0)
             {

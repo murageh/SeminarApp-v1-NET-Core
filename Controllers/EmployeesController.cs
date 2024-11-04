@@ -12,7 +12,7 @@ namespace WeatherApp.Controllers
         [HttpGet]
         public async Task<JsonResult> GetEmployees()
         {
-            List<Employee> employees = new List<Employee>();
+            List<Employee> employees;
             try
             {
                 employees = await Connection.FetchEmployees(null);
@@ -35,6 +35,7 @@ namespace WeatherApp.Controllers
                 {
                     success = true,
                     employees,
+                    count = employees.Count,
                     message = "Employees fetched successfully"
                 }
             );

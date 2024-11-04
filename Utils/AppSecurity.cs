@@ -36,9 +36,9 @@ namespace WeatherApp.Utils
                 return false;
             }
 
-            // Check if the timestamp is within the last 30 seconds
+            // Check if the timestamp is within the last 120 seconds
             var currentTime = DateTime.UtcNow;
-            if (Math.Abs((currentTime - requestTime).TotalSeconds) > 30)
+            if (Math.Abs((currentTime - requestTime).TotalSeconds) > 120)
             {
                 // Request is too old or too far in the future
                 return false;

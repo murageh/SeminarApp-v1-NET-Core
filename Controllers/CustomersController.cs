@@ -11,41 +11,9 @@ namespace WeatherApp.Controllers
     public class CustomersController : Controller
     {
         [HttpGet]
-        public async Task<JsonResult> GetCustomers(int? top=5, int? skip=0)
+        public async Task<JsonResult> GetCustomers(int? top = 5, int? skip = 0)
         {
-            // Get necessary headers for validation
-            var clientId = Request.Headers["client_id"].FirstOrDefault();
-            var timestamp = Request.Headers["timestamp"].FirstOrDefault();
-            var signature = Request.Headers["X-Signature"].FirstOrDefault();
-
-            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(timestamp) || string.IsNullOrEmpty(signature))
-            {
-                return Json(
-                    new
-                    {
-                        success = false,
-                        message = "Missing required headers"
-                    }
-                );
-            }
-
-            // Concatenate data passed for hashing
-            var data = $"top={top}&skip={skip}";
-
-            var secretKey = AppSecurity.RetrieveClientSecret(clientId);
-
-            if (!AppSecurity.ValidateRequest(clientId, timestamp, data, signature, secretKey))
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Unauthorized request"
-                });
-            }
-
-
-            // CLIENT IS AUTHENTICATED
-            List<Customer> customers = new List<Customer>();
+            List<Customer> customers;
             try
             {
                 customers = await Connection.FetchCustomers(null, top, skip);
@@ -53,7 +21,7 @@ namespace WeatherApp.Controllers
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                
+
                 return Json(
                     new
                     {
@@ -68,6 +36,8 @@ namespace WeatherApp.Controllers
                 {
                     success = true,
                     customers,
+                    count = customers.Count,
+                    top, skip,
                     message = "Customers fetched successfully"
                 }
             );

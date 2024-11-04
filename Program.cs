@@ -1,4 +1,6 @@
 
+using WeatherApp.Middleware;
+
 namespace WeatherApp
 {
     public class Program
@@ -16,6 +18,13 @@ namespace WeatherApp
 
             var app = builder.Build();
 
+            // Add custom request validation middleware for token authentication
+            app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/Customers"), appBuilder =>
+            {
+                appBuilder.UseMiddleware<RequestValidationMiddleware>();
+            });
+
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -26,7 +35,6 @@ namespace WeatherApp
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

@@ -17,10 +17,6 @@ namespace WeatherApp.Models
             return _baseUri;
         }
 
-        public Connection()
-        {
-        }
-
         public static NetworkCredential GetCredentials()
         {
             // if (authenticate)
@@ -30,11 +26,11 @@ namespace WeatherApp.Models
             return CredentialCache.DefaultNetworkCredentials;
         }
 
-        public static async Task<List<Employee>> FetchEmployees(string? empNo)
+        public static Task<List<Employee>> FetchEmployees(string? empNo)
         {
-            List<Employee> employees = new List<Employee>();
+            List<Employee> employees = [];
 
-            HttpClient client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
             client.BaseAddress = new Uri(_baseUri);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -47,28 +43,25 @@ namespace WeatherApp.Models
 
             HttpResponseMessage response = client.GetAsync(filter).Result;
 
-            if (response.IsSuccessStatusCode)
-            {
-                var data = response.Content.ReadAsStringAsync().Result;
-                var employeesResponse = JsonSerializer.Deserialize<EmployeesResponse>(data);
+            // early return
+            if (!response.IsSuccessStatusCode) return Task.FromResult(employees);
 
-                if (employeesResponse != null)
-                {
-                    foreach (var employee in employeesResponse.value)
-                    {
-                        employees.Add(employee);
-                    }
-                }
+            var data = response.Content.ReadAsStringAsync().Result;
+            var employeesResponse = JsonSerializer.Deserialize<EmployeesResponse>(data);
+
+            if (employeesResponse != null)
+            {
+                employees.AddRange(employeesResponse.value);
             }
 
-            return employees;
+            return Task.FromResult(employees);
         }
 
-        public static async Task<List<Customer>> FetchCustomers(string custNo=null, int? top = Int32.MaxValue, int? skip=0)
+        public static Task<List<Customer>> FetchCustomers(string? custNo=null, int? top = int.MaxValue, int? skip=0)
         {
-            List<Customer> customers = new List<Customer>();
-
-            HttpClient client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            List<Customer> customers = [];
+            
+            HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
             client.BaseAddress = new Uri(_baseUri);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -79,28 +72,25 @@ namespace WeatherApp.Models
                 filter += FilterHelper.GenerateFilter("No", custNo, true);
             }
             
-            if (top != Int32.MaxValue && top != null)
+            if (top != int.MaxValue && top != null)
             {
+                skip ??= 0;
                 filter += FilterHelper.GenerateTopQuery(top.Value, skip.Value, string.IsNullOrEmpty(custNo));
             }
 
             HttpResponseMessage response = client.GetAsync(filter).Result;
 
-            if (response.IsSuccessStatusCode)
-            {
-                var data = response.Content.ReadAsStringAsync().Result;
-                var customersResponse = JsonSerializer.Deserialize<CustomerResponse>(data);
+            // early return
+            if (!response.IsSuccessStatusCode) return Task.FromResult(customers);
 
-                if (customersResponse != null)
-                {
-                    foreach (var customer in customersResponse.value)
-                    {
-                        customers.Add(customer);
-                    }
-                }
-            }
+            var data = response.Content.ReadAsStringAsync().Result;
+            var customersResponse = JsonSerializer.Deserialize<CustomerResponse>(data);
 
-            return customers;
+            if (customersResponse == null) return Task.FromResult(customers);
+
+            customers.AddRange(customersResponse.value);
+
+            return Task.FromResult(customers);
         }
     }
 }
