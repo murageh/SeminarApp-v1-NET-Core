@@ -10,7 +10,7 @@ namespace WeatherApp.Controllers
     public class EmployeesController : Controller
     {
         [HttpGet]
-        public async Task<JsonResult> GetEmployees()
+        public async Task<IActionResult> GetEmployees()
         {
             List<Employee> employees;
             try
@@ -20,14 +20,12 @@ namespace WeatherApp.Controllers
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                
-                return Json(
-                    new
-                    {
-                        success = false,
-                        message = e.Message
-                    }
-                );
+
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = e.Message
+                });
             }
 
             return Json(
@@ -42,34 +40,39 @@ namespace WeatherApp.Controllers
         }
 
         [HttpGet("{empNo}")]
-        public async Task<JsonResult> GetEmployee(string empNo)
+        public async Task<IActionResult> GetEmployee(string empNo)
         {
-            Employee employee;
+            Employee? employee;
             try
             {
                 var lst = await Connection.FetchEmployees(empNo);
-                employee = lst.First();
+                employee = lst.FirstOrDefault();
+                if (employee == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Employee not found"
+                    });
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Json(
-                    new
-                    {
-                        success = false,
-                        message = e.Message,
-                    }
-                );
+
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = e.Message
+                });
             }
 
-            return Json(
-                new
-                {
-                    success = true,
-                    employee,
-                    message = "Employee fetched successfully"
-                }
-            );
+            return Ok(new
+            {
+                success = true,
+                employee,
+                message = "Employee fetched successfully"
+            });
         }
     }
 }

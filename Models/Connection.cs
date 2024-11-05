@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using WeatherApp.DTOs;
 using WeatherApp.Utils;
@@ -57,10 +58,10 @@ namespace WeatherApp.Models
             return Task.FromResult(employees);
         }
 
-        public static Task<List<Customer>> FetchCustomers(string? custNo=null, int? top = int.MaxValue, int? skip=0)
+        public static Task<List<Customer>> FetchCustomers(string? custNo = null, int? top = int.MaxValue, int? skip = 0)
         {
             List<Customer> customers = [];
-            
+
             HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
             client.BaseAddress = new Uri(_baseUri);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -71,7 +72,7 @@ namespace WeatherApp.Models
             {
                 filter += FilterHelper.GenerateFilter("No", custNo, true);
             }
-            
+
             if (top != int.MaxValue && top != null)
             {
                 skip ??= 0;
@@ -91,6 +92,43 @@ namespace WeatherApp.Models
             customers.AddRange(customersResponse.value);
 
             return Task.FromResult(customers);
+        }
+
+        public static async Task<KCB> GetKCBToken()
+        {
+            var kcbInstance = new KCB();
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://uat.buni.kcbgroup.com/token?grant_type=client_credentials"
+            );
+            request.Headers.Add(
+                "Authorization",
+                "Basic YWVPRV90eWxYT2themFFZTdWTHRhTkk2bnhvYTpfTUR4OGtBc1h5aHRUN0VreWoxd"
+            );
+            request.Headers.Add(
+                "Cookie",
+                "4b1f380494b4bbde9d5435be5996a54d=ca8dddc54d876b7eda4e66af2077dbd8"
+            );
+            var response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadAsStringAsync();
+                var kcbSuccessRes = JsonSerializer.Deserialize<KCB.SuccessRes>(data);
+
+                kcbInstance.success = true;
+                kcbInstance.successRes = kcbSuccessRes;
+            }
+            else
+            {
+                var data = await response.Content.ReadAsStringAsync();
+                var kcbErrorRes = JsonSerializer.Deserialize<KCB.ErrorRes>(data);
+
+                kcbInstance.success = false;
+                kcbInstance.errorRes = kcbErrorRes;
+            }
+
+            return kcbInstance;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace WeatherApp.Controllers
     public class CustomersController : Controller
     {
         [HttpGet]
-        public async Task<JsonResult> GetCustomers(int? top = 5, int? skip = 0)
+        public async Task<IActionResult> GetCustomers(int? top = 5, int? skip = 0)
         {
             List<Customer> customers;
             try
@@ -22,56 +22,57 @@ namespace WeatherApp.Controllers
             {
                 Console.WriteLine(e);
 
-                return Json(
-                    new
-                    {
-                        success = false,
-                        message = e.Message
-                    }
-                );
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = e.Message
+                });
             }
 
-            return Json(
-                new
-                {
-                    success = true,
-                    customers,
-                    count = customers.Count,
-                    top, skip,
-                    message = "Customers fetched successfully"
-                }
-            );
+            return Ok(new
+            {
+                success = true,
+                customers,
+                count = customers.Count,
+                top,
+                skip,
+                message = "Customers fetched successfully"
+            });
         }
 
         [HttpGet("{custNo}")]
-        public async Task<JsonResult> GetCustomer(string custNo)
+        public async Task<IActionResult> GetCustomer(string custNo)
         {
-            Customer customer;
+            Customer? customer;
             try
             {
                 var lst = await Connection.FetchCustomers(custNo);
-                customer = lst.First();
+                customer = lst.FirstOrDefault();
+                if (customer == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Customer not found"
+                    });
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Json(
-                    new
-                    {
-                        success = false,
-                        message = e.Message,
-                    }
-                );
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = e.Message
+                });
             }
 
-            return Json(
-                new
-                {
-                    success = true,
-                    customer,
-                    message = "Customer fetched successfully"
-                }
-            );
+            return Ok(new
+            {
+                success = true,
+                customer,
+                message = "Customer fetched successfully"
+            });
         }
     }
 }
