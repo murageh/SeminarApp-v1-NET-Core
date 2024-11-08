@@ -1,22 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WeatherApp.DTOs;
 using WeatherApp.Models;
-using WeatherApp.Utils;
 
 namespace WeatherApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class CustomersController : Controller
+    public class EmployeeController : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> GetCustomers(int? top = 5, int? skip = 0)
+        public async Task<IActionResult> GetEmployees()
         {
-            List<Customer> customers;
+            List<Employee> employees;
             try
             {
-                customers = await Connection.FetchCustomers(null, top, skip);
+                employees = await Connection.FetchEmployees(null);
             }
             catch (Exception e)
             {
@@ -29,37 +28,38 @@ namespace WeatherApp.Controllers
                 });
             }
 
-            return Ok(new
-            {
-                success = true,
-                customers,
-                count = customers.Count,
-                top,
-                skip,
-                message = "Customers fetched successfully"
-            });
+            return Json(
+                new
+                {
+                    success = true,
+                    employees,
+                    count = employees.Count,
+                    message = "Employees fetched successfully"
+                }
+            );
         }
 
-        [HttpGet("{custNo}")]
-        public async Task<IActionResult> GetCustomer(string custNo)
+        [HttpGet("{empNo}")]
+        public async Task<IActionResult> GetEmployee(string empNo)
         {
-            Customer? customer;
+            Employee? employee;
             try
             {
-                var lst = await Connection.FetchCustomers(custNo);
-                customer = lst.FirstOrDefault();
-                if (customer == null)
+                var lst = await Connection.FetchEmployees(empNo);
+                employee = lst.FirstOrDefault();
+                if (employee == null)
                 {
                     return NotFound(new
                     {
                         success = false,
-                        message = "Customer not found"
+                        message = "Employee not found"
                     });
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+
                 return StatusCode(500, new
                 {
                     success = false,
@@ -70,8 +70,8 @@ namespace WeatherApp.Controllers
             return Ok(new
             {
                 success = true,
-                customer,
-                message = "Customer fetched successfully"
+                employee,
+                message = "Employee fetched successfully"
             });
         }
     }

@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using WeatherApp.DTOs;
 using WeatherApp.Utils;
@@ -9,13 +8,13 @@ namespace WeatherApp.Models
 {
     public class Connection
     {
-        private static string _baseUri = "http://murageh:7048/BC240/ODataV4/Company('CRONUS%20International%20Ltd.')/";
-        public static string EmpPath = "EmpList";
-        public static string CustPath = "CustList";
+        private const string BaseUri = "http://murageh:7048/BC240/ODataV4/Company('CRONUS%20International%20Ltd.')/";
+        private const string EmpPath = "EmpList";
+        private const string CustPath = "CustList";
 
         public static string GetBaseUri()
         {
-            return _baseUri;
+            return BaseUri;
         }
 
         public static NetworkCredential GetCredentials()
@@ -32,7 +31,7 @@ namespace WeatherApp.Models
             List<Employee> employees = [];
 
             HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
-            client.BaseAddress = new Uri(_baseUri);
+            client.BaseAddress = new Uri(BaseUri);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             // generate filters if empNo is not null
@@ -63,7 +62,7 @@ namespace WeatherApp.Models
             List<Customer> customers = [];
 
             HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
-            client.BaseAddress = new Uri(_baseUri);
+            client.BaseAddress = new Uri(BaseUri);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             // generate filters if custNo is not null

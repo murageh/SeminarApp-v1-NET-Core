@@ -1,60 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WeatherApp.DTOs;
 using WeatherApp.Models;
+using WeatherApp.Utils;
 
 namespace WeatherApp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class EmployeesController : Controller
+    public class CustomerController : Controller
     {
         [HttpGet]
-        public async Task<IActionResult> GetEmployees()
+        public async Task<IActionResult> GetCustomers(int? top = 5, int? skip = 0)
         {
-            List<Employee> employees;
+            List<Customer> customers;
             try
             {
-                employees = await Connection.FetchEmployees(null);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = e.Message
-                });
-            }
-
-            return Json(
-                new
-                {
-                    success = true,
-                    employees,
-                    count = employees.Count,
-                    message = "Employees fetched successfully"
-                }
-            );
-        }
-
-        [HttpGet("{empNo}")]
-        public async Task<IActionResult> GetEmployee(string empNo)
-        {
-            Employee? employee;
-            try
-            {
-                var lst = await Connection.FetchEmployees(empNo);
-                employee = lst.FirstOrDefault();
-                if (employee == null)
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "Employee not found"
-                    });
-                }
+                customers = await Connection.FetchCustomers(null, top, skip);
             }
             catch (Exception e)
             {
@@ -70,8 +32,46 @@ namespace WeatherApp.Controllers
             return Ok(new
             {
                 success = true,
-                employee,
-                message = "Employee fetched successfully"
+                customers,
+                count = customers.Count,
+                top,
+                skip,
+                message = "Customers fetched successfully"
+            });
+        }
+
+        [HttpGet("{custNo}")]
+        public async Task<IActionResult> GetCustomer(string custNo)
+        {
+            Customer? customer;
+            try
+            {
+                var lst = await Connection.FetchCustomers(custNo);
+                customer = lst.FirstOrDefault();
+                if (customer == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Customer not found"
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = e.Message
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                customer,
+                message = "Customer fetched successfully"
             });
         }
     }
