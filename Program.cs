@@ -1,5 +1,9 @@
 
+using WeatherApp.DTOs;
+using WeatherApp.Interfaces;
 using WeatherApp.Middleware;
+using WeatherApp.Models;
+using WeatherApp.Services;
 
 namespace WeatherApp
 {
@@ -15,6 +19,18 @@ namespace WeatherApp
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            /*
+             * CUSTOM OBJECTS
+             * Register CustomerService with HttpClient and default credentials.
+             */
+            builder.Services.AddHttpClient<SeminarService>()
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    UseDefaultCredentials = true,
+                });
+            builder.Services.AddScoped<ISeminar, SeminarService>();
+            builder.Services.AddSingleton<Credentials>();
 
             var app = builder.Build();
 
