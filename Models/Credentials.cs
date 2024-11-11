@@ -34,7 +34,7 @@ namespace WeatherApp.Models
         }
 
 
-        public NAVWS.RenameSeminar_PortClient ObjNav()
+        public NAVWS.SeminarIntegration_PortClient ObjNav()
         {
             // Configure the binding
             var binding = new BasicHttpBinding(BasicHttpSecurityMode.TransportCredentialOnly)
@@ -52,7 +52,7 @@ namespace WeatherApp.Models
             var endpointAddress = new EndpointAddress("http://murageh:7047/BC240/WS/CRONUS%20International%20Ltd./Codeunit/RenameSeminar");
 
             // Instantiate the service client with the binding and endpoint
-            return new NAVWS.RenameSeminar_PortClient(binding, endpointAddress);
+            return new NAVWS.SeminarIntegration_PortClient(binding, endpointAddress);
         }
 
 

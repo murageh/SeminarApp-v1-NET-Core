@@ -12,35 +12,35 @@ namespace NAVWS
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", ConfigurationName="NAVWS.RenameSeminar_Port")]
-    public interface RenameSeminar_Port
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", ConfigurationName="NAVWS.SeminarIntegration_Port")]
+    public interface SeminarIntegration_Port
     {
         
         // CODEGEN: Generating message contract since the wrapper name (RenameSeminar_Result) of message RenameSeminar_Result does not match the default value (RenameSeminar)
-        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar:RenameSeminar", ReplyAction="*")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:RenameSeminar", ReplyAction="*")]
         NAVWS.RenameSeminar_Result RenameSeminar(NAVWS.RenameSeminar request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar:RenameSeminar", ReplyAction="*")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:RenameSeminar", ReplyAction="*")]
         System.Threading.Tasks.Task<NAVWS.RenameSeminar_Result> RenameSeminarAsync(NAVWS.RenameSeminar request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="RenameSeminar", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", IsWrapped=true)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="RenameSeminar", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
     public partial class RenameSeminar
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", Order=0)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
         public string no;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", Order=1)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=1)]
         public string seminarName;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", Order=2)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=2)]
         public int seminarDuration;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", Order=3)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=3)]
         public decimal seminarPrice;
         
         public RenameSeminar()
@@ -59,7 +59,7 @@ namespace NAVWS
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="RenameSeminar_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/RenameSeminar", IsWrapped=true)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="RenameSeminar_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
     public partial class RenameSeminar_Result
     {
         
@@ -69,13 +69,13 @@ namespace NAVWS
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    public interface RenameSeminar_PortChannel : NAVWS.RenameSeminar_Port, System.ServiceModel.IClientChannel
+    public interface SeminarIntegration_PortChannel : NAVWS.SeminarIntegration_Port, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    public partial class RenameSeminar_PortClient : System.ServiceModel.ClientBase<NAVWS.RenameSeminar_Port>, NAVWS.RenameSeminar_Port
+    public partial class SeminarIntegration_PortClient : System.ServiceModel.ClientBase<NAVWS.SeminarIntegration_Port>, NAVWS.SeminarIntegration_Port
     {
         
         /// <summary>
@@ -85,41 +85,41 @@ namespace NAVWS
         /// <param name="clientCredentials">The client credentials</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
         
-        public RenameSeminar_PortClient() : 
-                base(RenameSeminar_PortClient.GetDefaultBinding(), RenameSeminar_PortClient.GetDefaultEndpointAddress())
+        public SeminarIntegration_PortClient() : 
+                base(SeminarIntegration_PortClient.GetDefaultBinding(), SeminarIntegration_PortClient.GetDefaultEndpointAddress())
         {
-            this.Endpoint.Name = EndpointConfiguration.RenameSeminar_Port.ToString();
+            this.Endpoint.Name = EndpointConfiguration.SeminarIntegration_Port.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
         
-        public RenameSeminar_PortClient(EndpointConfiguration endpointConfiguration) : 
-                base(RenameSeminar_PortClient.GetBindingForEndpoint(endpointConfiguration), RenameSeminar_PortClient.GetEndpointAddress(endpointConfiguration))
-        {
-            this.Endpoint.Name = endpointConfiguration.ToString();
-            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
-        }
-        
-        public RenameSeminar_PortClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
-                base(RenameSeminar_PortClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
+        public SeminarIntegration_PortClient(EndpointConfiguration endpointConfiguration) : 
+                base(SeminarIntegration_PortClient.GetBindingForEndpoint(endpointConfiguration), SeminarIntegration_PortClient.GetEndpointAddress(endpointConfiguration))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
         
-        public RenameSeminar_PortClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(RenameSeminar_PortClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
+        public SeminarIntegration_PortClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
+                base(SeminarIntegration_PortClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
         
-        public RenameSeminar_PortClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public SeminarIntegration_PortClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(SeminarIntegration_PortClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
+        {
+            this.Endpoint.Name = endpointConfiguration.ToString();
+            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
+        }
+        
+        public SeminarIntegration_PortClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress)
         {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        NAVWS.RenameSeminar_Result NAVWS.RenameSeminar_Port.RenameSeminar(NAVWS.RenameSeminar request)
+        NAVWS.RenameSeminar_Result NAVWS.SeminarIntegration_Port.RenameSeminar(NAVWS.RenameSeminar request)
         {
             return base.Channel.RenameSeminar(request);
         }
@@ -131,11 +131,11 @@ namespace NAVWS
             inValue.seminarName = seminarName;
             inValue.seminarDuration = seminarDuration;
             inValue.seminarPrice = seminarPrice;
-            NAVWS.RenameSeminar_Result retVal = ((NAVWS.RenameSeminar_Port)(this)).RenameSeminar(inValue);
+            NAVWS.RenameSeminar_Result retVal = ((NAVWS.SeminarIntegration_Port)(this)).RenameSeminar(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<NAVWS.RenameSeminar_Result> NAVWS.RenameSeminar_Port.RenameSeminarAsync(NAVWS.RenameSeminar request)
+        System.Threading.Tasks.Task<NAVWS.RenameSeminar_Result> NAVWS.SeminarIntegration_Port.RenameSeminarAsync(NAVWS.RenameSeminar request)
         {
             return base.Channel.RenameSeminarAsync(request);
         }
@@ -147,7 +147,7 @@ namespace NAVWS
             inValue.seminarName = seminarName;
             inValue.seminarDuration = seminarDuration;
             inValue.seminarPrice = seminarPrice;
-            return ((NAVWS.RenameSeminar_Port)(this)).RenameSeminarAsync(inValue);
+            return ((NAVWS.SeminarIntegration_Port)(this)).RenameSeminarAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()
@@ -157,7 +157,7 @@ namespace NAVWS
         
         private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
-            if ((endpointConfiguration == EndpointConfiguration.RenameSeminar_Port))
+            if ((endpointConfiguration == EndpointConfiguration.SeminarIntegration_Port))
             {
                 System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
                 result.MaxBufferSize = int.MaxValue;
@@ -171,27 +171,28 @@ namespace NAVWS
         
         private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
-            if ((endpointConfiguration == EndpointConfiguration.RenameSeminar_Port))
+            if ((endpointConfiguration == EndpointConfiguration.SeminarIntegration_Port))
             {
-                return new System.ServiceModel.EndpointAddress("http://murageh:7047/BC240/WS/CRONUS International Ltd./Codeunit/RenameSeminar");
+                return new System.ServiceModel.EndpointAddress("http://murageh:7047/BC240/WS/CRONUS International Ltd./Codeunit/SeminarIntegratio" +
+                        "n");
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
         
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
-            return RenameSeminar_PortClient.GetBindingForEndpoint(EndpointConfiguration.RenameSeminar_Port);
+            return SeminarIntegration_PortClient.GetBindingForEndpoint(EndpointConfiguration.SeminarIntegration_Port);
         }
         
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
-            return RenameSeminar_PortClient.GetEndpointAddress(EndpointConfiguration.RenameSeminar_Port);
+            return SeminarIntegration_PortClient.GetEndpointAddress(EndpointConfiguration.SeminarIntegration_Port);
         }
         
         public enum EndpointConfiguration
         {
             
-            RenameSeminar_Port,
+            SeminarIntegration_Port,
         }
     }
 }
