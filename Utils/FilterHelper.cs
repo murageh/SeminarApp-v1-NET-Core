@@ -1,4 +1,4 @@
-﻿namespace WeatherApp.Utils
+﻿namespace SeminarIntegration.Utils
 {
     /// <summary>
     /// This class contains helper methods that generate OData filters

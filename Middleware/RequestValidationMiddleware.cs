@@ -1,10 +1,7 @@
-﻿using WeatherApp.Utils;
+﻿using SeminarIntegration.Utils;
 
-namespace WeatherApp.Middleware
+namespace SeminarIntegration.Middleware
 {
-    using Microsoft.AspNetCore.Http;
-    using System.Threading.Tasks;
-
     public class RequestValidationMiddleware(RequestDelegate next)
     {
         public async Task InvokeAsync(HttpContext context)

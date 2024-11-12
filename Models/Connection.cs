@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using WeatherApp.DTOs;
-using WeatherApp.Utils;
+using SeminarIntegration.DTOs;
+using SeminarIntegration.Utils;
 
-namespace WeatherApp.Models
+namespace SeminarIntegration.Models
 {
     public class Connection
     {

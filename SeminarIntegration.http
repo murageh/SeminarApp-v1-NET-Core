@@ -1,0 +1,6 @@
+@SeminarIntegration_HostAddress = http://localhost:5294
+
+GET {{SeminarIntegration_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

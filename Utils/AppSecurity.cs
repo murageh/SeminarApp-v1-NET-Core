@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace WeatherApp.Utils
+namespace SeminarIntegration.Utils
 {
     public class AppSecurity
     {

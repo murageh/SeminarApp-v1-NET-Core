@@ -1,4 +1,4 @@
-﻿namespace WeatherApp.DTOs
+﻿namespace SeminarIntegration.DTOs
 {
     public class Employee
     {

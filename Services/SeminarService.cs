@@ -1,13 +1,11 @@
 ﻿using System.Net;
 using System.Text;
-using System.Text.Json.Nodes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using WeatherApp.DTOs;
-using WeatherApp.Interfaces;
-using WeatherApp.Models;
+using SeminarIntegration.Interfaces;
+using SeminarIntegration.Models;
 
-namespace WeatherApp.Services
+namespace SeminarIntegration.Services
 {
     public class SeminarService(HttpClient httpClient, IConfiguration config, Credentials credentials)
         : ISeminar

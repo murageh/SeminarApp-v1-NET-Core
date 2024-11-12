@@ -1,11 +1,9 @@
+using SeminarIntegration.Middleware;
+using SeminarIntegration.Services;
+using SeminarIntegration.Interfaces;
+using SeminarIntegration.Models;
 
-using WeatherApp.DTOs;
-using WeatherApp.Interfaces;
-using WeatherApp.Middleware;
-using WeatherApp.Models;
-using WeatherApp.Services;
-
-namespace WeatherApp
+namespace SeminarIntegration
 {
     public class Program
     {

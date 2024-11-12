@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WeatherApp.DTOs;
-using WeatherApp.Interfaces;
-using WeatherApp.Models;
-using WeatherApp.Services;
-using WeatherApp.Utils;
+using SeminarIntegration.Interfaces;
+using SeminarIntegration.Services;
 
-namespace WeatherApp.Controllers
+namespace SeminarIntegration.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

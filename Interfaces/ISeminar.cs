@@ -1,6 +1,6 @@
-﻿using WeatherApp.Services;
+﻿using SeminarIntegration.Services;
 
-namespace WeatherApp.Interfaces
+namespace SeminarIntegration.Interfaces
 {
     public interface ISeminar
     {
