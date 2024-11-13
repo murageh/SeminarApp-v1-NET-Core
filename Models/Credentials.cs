@@ -49,7 +49,7 @@ namespace SeminarIntegration.Models
             };
 
             // Create the endpoint address
-            var endpointAddress = new EndpointAddress("http://murageh:7047/BC240/WS/CRONUS%20International%20Ltd./Codeunit/RenameSeminar");
+            var endpointAddress = new EndpointAddress("http://murageh:7047/BC240/WS/CRONUS%20International%20Ltd./Codeunit/SeminarIntegration");
 
             // Instantiate the service client with the binding and endpoint
             return new NAVWS.SeminarIntegration_PortClient(binding, endpointAddress);

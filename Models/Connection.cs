@@ -8,9 +8,10 @@ namespace SeminarIntegration.Models
 {
     public class Connection
     {
-        private const string BaseUri = "http://murageh:7048/BC240/ODataV4/Company('CRONUS%20International%20Ltd.')/";
-        private const string EmpPath = "EmpList";
-        private const string CustPath = "CustList";
+        public const string BaseUri = "http://murageh:7048/BC240/ODataV4/Company('CRONUS%20International%20Ltd.')/";
+        public const string EmpPath = "EmpList";
+        public const string CustPath = "CustList";
+        public const string SemListPath = "SeminarList";
 
         public static string GetBaseUri()
         {
