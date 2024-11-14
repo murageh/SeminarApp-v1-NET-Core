@@ -12,6 +12,15 @@ namespace SeminarIntegration.Models
         public const string EmpPath = "EmpList";
         public const string CustPath = "CustList";
         public const string SemListPath = "SeminarList";
+        private static IConfiguration _config;
+
+        public static bool ShouldAuthenticateExternally;
+
+        public Connection(IConfiguration config)
+        {
+            _config = config;
+            ShouldAuthenticateExternally = _config.GetValue<bool>("AppSettings:UseWindowsAuth");
+        }
 
         public static string GetBaseUri()
         {
@@ -20,11 +29,9 @@ namespace SeminarIntegration.Models
 
         public static NetworkCredential GetCredentials()
         {
-            // if (authenticate)
-            //     return new NetworkCredential(ConfigurationManager.AppSettings["W_USER"],
-            //         ConfigurationManager.AppSettings["W_PWD"], ConfigurationManager.AppSettings["DOMAIN"]);
-            // else
-            return CredentialCache.DefaultNetworkCredentials;
+            return ShouldAuthenticateExternally 
+                ? new NetworkCredential(_config["W_USER"], _config["W_PWD"], _config["DOMAIN"]) 
+                : CredentialCache.DefaultNetworkCredentials;
         }
 
         public static Task<List<Employee>> FetchEmployees(string? empNo)
@@ -60,7 +67,7 @@ namespace SeminarIntegration.Models
 
         public static Task<List<Customer>> FetchCustomers(string? custNo = null, int? top = int.MaxValue, int? skip = 0)
         {
-            List<Customer> customers = [];
+            List<Customer> customers = new List<Customer>();
 
             HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true });
             client.BaseAddress = new Uri(BaseUri);

@@ -17,12 +17,7 @@ namespace SeminarIntegration.Models
 
             var handler = new HttpClientHandler
             {
-                // Credentials = new NetworkCredential(
-                //     _configuration["AppSettings:W_USER"],
-                //     _configuration["AppSettings:W_PWD"],
-                //     _configuration["AppSettings:DOMAIN"]),
-                Credentials = CredentialCache.DefaultNetworkCredentials,
-
+                Credentials = Connection.GetCredentials(),
                 // Ensure proper server certificate validation
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
             };

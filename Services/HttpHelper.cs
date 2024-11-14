@@ -2,6 +2,7 @@
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using SeminarIntegration.Models;
 
 namespace SeminarIntegration.Services
 {
@@ -18,7 +19,7 @@ namespace SeminarIntegration.Services
                     new JsonSerializerSettings { ContractResolver = CamelCaseOptions });
                 var handler = new HttpClientHandler
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = Connection.GetCredentials()
                 };
                 using var httpClient = new HttpClient(handler);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
@@ -47,7 +48,7 @@ namespace SeminarIntegration.Services
             {
                 var handler = new HttpClientHandler
                 {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
+                    Credentials = Connection.GetCredentials()
                 };
                 using var httpClient = new HttpClient(handler);
                 
