@@ -25,6 +25,7 @@ namespace SeminarIntegration.MappingProfiles
 
             // for responses
             CreateMap<User, NormalUserResponse>();
+            CreateMap<User, ElevatedNormalUserResponse>();
 
             CreateMap<UpdateUserRequest, User>()
                 .ForMember(dest => dest.FirstName, opt => opt.Condition(src => src.FirstName != null))

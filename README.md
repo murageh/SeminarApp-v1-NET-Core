@@ -81,7 +81,26 @@ or (for Windows)
 .\apply-migrations.bat
 ```
 
-### 5. Run the Application
+
+### 5. Configure Authentication
+
+This application uses JWT authentication. You need to configure the JWT settings in the `appsettings.json` file:
+```json
+{
+  // ...
+  ""AuthSettings": {
+        "SecretKey": "THIS_IS_MY_AUTHENTICATION_SECRET!!",
+        "Issuer": "http://localhost",
+        "Audience": "http://localhost"
+    },
+// ...
+}
+```
+
+You should adjust the `SecretKey`, `Issuer`, and `Audience` values to match your application's requirements.
+
+
+### 6. Run the Application
 
 Run the application using the following command:
 

@@ -50,10 +50,10 @@ namespace SeminarIntegration.DTOs
         public bool IsUser() => Role == "user";
     }
 
-    public class Credentials
+    public class LoginRequest
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        [Required] public string Username { get; set; }
+        [Required] public string Password { get; set; }
     }
 
     public class NewUserRequest
@@ -83,6 +83,16 @@ namespace SeminarIntegration.DTOs
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Role { get; set; }
+    }
+
+    public class ElevatedNormalUserResponse : NormalUserResponse
+    {
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public bool IsDeleted { get; set; } = false;
+        public bool IsActive { get; set; } = true;
+        public DateTime? DeletedAt { get; set; }
+        public bool PreviouslyDeleted { get; set; }
     }
 
     // Response for User Creation

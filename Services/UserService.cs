@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Azure.Core;
+using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using SeminarIntegration.Data;
 using SeminarIntegration.DTOs;
@@ -11,29 +12,42 @@ namespace SeminarIntegration.Services
     public class UserService(UserDbContext context, ILogger<UserService> logger, IMapper mapper)
         : IUserService
     {
-        private readonly UserDbContext _context = context;
-        private readonly ILogger<UserService> _logger = logger;
-        private readonly IMapper _mapper = mapper;
-
-        public async Task<IEnumerable<NormalUserResponse>> GetUsersAsync()
+        private async Task<IEnumerable<User>> _fetchUsers(bool includeDeleted)
         {
-            var users = await _context.Users
-                .Where(u => !u.IsDeleted)
+            var users = await context.Users
+                .Where(u => includeDeleted || !u.IsDeleted)
                 .ToListAsync();
             if (users == null)
             {
                 throw new ValidationException("No users found");
             }
 
+            return users;
+        }
+
+        public async Task<IEnumerable<NormalUserResponse>> GetUsersAsync()
+        {
+            var users = await _fetchUsers(false);
+
             var lst = users
-                .Select(u => _mapper.Map<NormalUserResponse>(u))
+                .Select(u => mapper.Map<NormalUserResponse>(u))
+                .ToList();
+
+            return lst;
+        }
+
+        public async Task<IEnumerable<ElevatedNormalUserResponse>> GetAllUsersAsync()
+        {
+            var users = await _fetchUsers(true);
+            var lst = users
+                .Select(u => mapper.Map<ElevatedNormalUserResponse>(u))
                 .ToList();
             return lst;
         }
 
         public async Task<NormalUserResponse> GetUser(string username)
         {
-            var user = await _context.Users
+            var user = await context.Users
                 .Where(u => !u.IsDeleted)
                 .FirstOrDefaultAsync(u => u.Username == username);
             if (user == null)
@@ -41,7 +55,7 @@ namespace SeminarIntegration.Services
                 throw new ValidationException("User not found");
             }
 
-            return _mapper.Map<NormalUserResponse>(user);
+            return mapper.Map<NormalUserResponse>(user);
         }
 
         public async Task<NormalUserResponse> CreateUser(NewUserRequest newUserRequest)
@@ -61,8 +75,11 @@ namespace SeminarIntegration.Services
                         "Email, password, username, first name, and last name are required fields.");
                 }
 
+                string hashedPwd =
+                    BCrypt.Net.BCrypt.EnhancedHashPassword(newUserRequest.Password, hashType: HashType.SHA384);
+
                 // Check if a user with the same username or email exists and is deleted
-                user = await _context.Users
+                user = await context.Users
                     .Where(u => u.Username == newUserRequest.Username || u.Email == newUserRequest.Email)
                     .FirstOrDefaultAsync();
 
@@ -74,13 +91,13 @@ namespace SeminarIntegration.Services
                         user.IsDeleted = false;
                         user.DeletedAt = null;
                         user.UpdatedAt = DateTime.UtcNow;
-                        user.Password = newUserRequest.Password; // Update password if needed
+                        user.Password = hashedPwd;
                         user.FirstName = newUserRequest.FirstName;
                         user.LastName = newUserRequest.LastName;
                         user.Title = newUserRequest.Title;
                         user.Email = newUserRequest.Email;
                         user.PreviouslyDeleted = true; // Set PreviouslyDeleted flag
-                        _context.Users.Update(user);
+                        context.Users.Update(user);
                     }
                     else
                     {
@@ -90,13 +107,14 @@ namespace SeminarIntegration.Services
                 else
                 {
                     // Proceed with creating a new user
-                    user = _mapper.Map<NewUserRequest, User>(newUserRequest);
+                    user = mapper.Map<NewUserRequest, User>(newUserRequest);
+                    user.Password = hashedPwd;
                     user.Title ??= "";
                     user.CreatedAt = DateTime.UtcNow;
-                    _context.Users.Add(user);
+                    context.Users.Add(user);
                 }
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (ValidationException)
             {
@@ -104,11 +122,11 @@ namespace SeminarIntegration.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating the user.");
+                logger.LogError(ex, "An error occurred while creating the user.");
                 throw new Exception("An error occurred while creating the user.");
             }
 
-            return _mapper.Map<NormalUserResponse>(user);
+            return mapper.Map<NormalUserResponse>(user);
         }
 
         public async Task<NormalUserResponse> UpdateUser(string username, UpdateUserRequest updatedUser)
@@ -117,7 +135,7 @@ namespace SeminarIntegration.Services
 
             try
             {
-                user = await _context.Users
+                user = await context.Users
                     .Where(u => !u.IsDeleted)
                     .FirstOrDefaultAsync(u => u.Username == username);
                 if (user == null)
@@ -126,25 +144,25 @@ namespace SeminarIntegration.Services
                 }
 
                 // Proceed
-                user = _mapper.Map(updatedUser, user);
+                user = mapper.Map(updatedUser, user);
                 user.UpdatedAt = DateTime.UtcNow;
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating the user.");
+                logger.LogError(ex, "An error occurred while updating the user.");
                 throw new Exception("An error occurred while updating the user.");
             }
 
-            return _mapper.Map<NormalUserResponse>(user);
+            return mapper.Map<NormalUserResponse>(user);
         }
 
         public async Task<NormalUserResponse?> DeleteUser(string username)
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+                var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
                 if (user == null)
                 {
                     throw new ValidationException("User not found");
@@ -156,21 +174,36 @@ namespace SeminarIntegration.Services
 
                 // Copy user record to DeletedUserHistory table
                 var deletedUserHistory = DeletedUserHistory.FromUser(user);
-                _context.DeletedUserHistory.Add(deletedUserHistory);
+                context.DeletedUserHistory.Add(deletedUserHistory);
 
                 // Mark user as deleted
                 user.IsDeleted = true;
                 user.DeletedAt = DateTime.UtcNow;
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting the user.");
+                logger.LogError(ex, "An error occurred while deleting the user.");
                 throw new Exception("An error occurred while deleting the user.");
             }
 
             return default;
+        }
+
+        // For auth
+        public async Task<User?> GetUser(string username, string password)
+        {
+            var user = await context.Users
+                .Where(u => !u.IsDeleted)
+                .FirstOrDefaultAsync(u => u.Username == username);
+            
+            if (user == null) return default;
+
+            if (BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
+                return user;
+            else
+                return default;
         }
     }
 }

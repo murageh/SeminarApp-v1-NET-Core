@@ -3,6 +3,7 @@ using SeminarIntegration.DTOs;
 using SeminarIntegration.Interfaces;
 using SeminarIntegration.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SeminarIntegration.Controllers
 {
@@ -11,53 +12,76 @@ namespace SeminarIntegration.Controllers
     [Produces("application/json")]
     public class UserController(IUserService userService) : Controller
     {
-        private readonly IUserService _userService = userService;
+        private readonly ControllerHelpers _helpers = new();
 
-        [HttpPost]
-        [ActionName("create")]
-        [EndpointDescription("Creates a new user")]
-        public async Task<IActionResult> CreateUser(NewUserRequest newUser)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return await HandleRequestAsync(
-                () => _userService.CreateUser(newUser),
-                "Creating user",
-                "User created successfully.",
-                201
-            );
-        }
+        // [HttpPost]
+        // [ActionName("create")]
+        // [EndpointDescription("Creates a new user")]
+        // public async Task<IActionResult> CreateUser(NewUserRequest newUser)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
+        //
+        //     return await _helpers.HandleRequestAsync(
+        //         () => userService.CreateUser(newUser),
+        //         "Creating user",
+        //         "User created successfully.",
+        //         201,
+        //         HttpContext.Request.Path
+        //     );
+        // }
 
         [HttpGet]
         [ActionName("all")]
         [EndpointDescription("Fetches all users")]
+        [Authorize(Policy = "User")]
         public async Task<IActionResult> GetUsers()
         {
-            return await HandleRequestAsync(
-                () => _userService.GetUsersAsync(),
+            return await _helpers.HandleRequestAsync(
+                () => userService.GetUsersAsync(),
                 "Finding users",
-                "Users found successfully."
+                "Users found successfully.",
+                200,
+                HttpContext.Request.Path
+            );
+        }
+
+        [HttpGet("all")]
+        [ActionName("allUsers")]
+        [EndpointDescription("Fetches all users, including deleted users")]
+        [Authorize(Policy = "User")] // TODO: Change to Admin or elevated User
+        public async Task<IActionResult> GetAllUsers()
+        {
+            return await _helpers.HandleRequestAsync(
+                userService.GetAllUsersAsync,
+                "Finding users",
+                "Users found successfully.",
+                200,
+                HttpContext.Request.Path
             );
         }
 
         [HttpGet("{username}")]
         [ActionName("get")]
         [EndpointDescription("Fetches a specific user")]
+        [Authorize(Policy = "User")]
         public async Task<IActionResult> GetUser(string username)
         {
-            return await HandleRequestAsync(
-                () => _userService.GetUser(username),
+            return await _helpers.HandleRequestAsync(
+                () => userService.GetUser(username),
                 "Finding user",
-                "User found successfully."
+                "User found successfully.",
+                200,
+                HttpContext.Request.Path
             );
         }
 
         [HttpPatch("{username}")]
         [ActionName("update")]
         [EndpointDescription("Updates an existing user")]
+        [Authorize(Policy = "User")]
         public async Task<IActionResult> UpdateUser(string username, UpdateUserRequest updatedUser)
         {
             if (!ModelState.IsValid)
@@ -65,66 +89,28 @@ namespace SeminarIntegration.Controllers
                 return BadRequest(ModelState);
             }
 
-            return await HandleRequestAsync(
-                () => _userService.UpdateUser(username, updatedUser),
+            return await _helpers.HandleRequestAsync(
+                () => userService.UpdateUser(username, updatedUser),
                 "Updating user",
-                "User updated successfully."
+                "User updated successfully.",
+                200,
+                HttpContext.Request.Path
             );
         }
 
         [HttpDelete("{username}")]
         [ActionName("delete")]
         [EndpointDescription("Soft deletes a user")]
+        [Authorize(Policy = "User")]
         public async Task<IActionResult> DeleteUser(string username)
         {
-            return await HandleRequestAsync(
-                () => _userService.DeleteUser(username),
+            return await _helpers.HandleRequestAsync(
+                () => userService.DeleteUser(username),
                 "Deleting user",
-                "User deleted successfully."
+                "User deleted successfully.",
+                200,
+                HttpContext.Request.Path
             );
-        }
-
-
-        // Helper methods
-        private async Task<IActionResult> HandleRequestAsync<T>(Func<Task<T>> action, string successTitle, string successMessage, int successStatusCode = 200)
-        {
-            AppResponse<T>.BaseResponse response;
-            var fullPath = $"{HttpContext.Request.Path}";
-            try
-            {
-                var result = await action();
-                response = new AppResponse<T>.SuccessResponse
-                {
-                    Title = successTitle,
-                    Path = fullPath,
-                    StatusCode = successStatusCode,
-                    Message = successMessage,
-                    Data = result
-                };
-                return StatusCode(successStatusCode, response);
-            }
-            catch (ValidationException ex)
-            {
-                response = new AppResponse<T>.ErrorResponse
-                {
-                    Title = $"Error {successTitle.ToLower()}",
-                    Path = fullPath,
-                    StatusCode = 400,
-                    Message = ex.Message
-                };
-                return StatusCode(response.StatusCode, response);
-            }
-            catch (Exception ex)
-            {
-                response = new AppResponse<T>.ErrorResponse
-                {
-                    Title = $"Error {successTitle.ToLower()}",
-                    Path = fullPath,
-                    StatusCode = 500,
-                    Message = ex.Message
-                };
-                return StatusCode(response.StatusCode, response);
-            }
         }
     }
 }
