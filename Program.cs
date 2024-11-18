@@ -10,6 +10,7 @@ using SeminarIntegration.Models;
 using SeminarIntegration.Controllers;
 using SeminarIntegration.Services.Auth;
 using SeminarIntegration.Utils;
+using Microsoft.Net.Http.Headers;
 
 namespace SeminarIntegration
 {
@@ -18,6 +19,31 @@ namespace SeminarIntegration
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            const string MyAllowSpecificOrigins = "_MyAllowSpecificOrigins";
+            // Add CORS Policies
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    name: MyAllowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins(
+                                "http://localhost:5173"
+                            )
+                            .WithHeaders(
+                                HeaderNames.Accept, HeaderNames.ContentType, HeaderNames.Origin,
+                                HeaderNames.Authorization,
+                                HeaderNames.AccessControlRequestHeaders,
+                                HeaderNames.AccessControlRequestMethod,
+                                HeaderNames.AccessControlAllowHeaders,
+                                HeaderNames.AccessControlAllowMethods,
+                                "x-custom-header"
+                            );
+                        // .AllowAnyHeader()
+                        ;
+                    });
+            });
 
             // Add services to the container.
 
@@ -96,19 +122,24 @@ namespace SeminarIntegration
                 })
                 .AddJwtBearer(jwtBearerOptions =>
                 {
+                    jwtBearerOptions.Authority = builder.Configuration["AuthSettings:Authority"];
+                    jwtBearerOptions.Audience = builder.Configuration["AuthSettings:Audience"];
+                    jwtBearerOptions.IncludeErrorDetails = true;
                     jwtBearerOptions.RequireHttpsMetadata = false; // For development only
                     jwtBearerOptions.SaveToken = true;
+
                     jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes("123456789ABCDEF101112131415161718191A")
+                        ),
+                        ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = false,
+                        ValidateIssuerSigningKey = false,
                         ValidIssuer = builder.Configuration["AuthSettings:Issuer"],
-                        ValidAudience = builder.Configuration["AuthSettings:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-                            builder.Configuration["AuthSettings:SecretKey"] ??
-                            throw new InvalidOperationException("No secret configured."))),
+                        ValidAudience = builder.Configuration["AuthSettings:Audience"]
                     };
                 });
             builder.Services.AddAuthorization(options =>
@@ -138,6 +169,8 @@ namespace SeminarIntegration
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseAuthentication(); // For jwt token authentication
 

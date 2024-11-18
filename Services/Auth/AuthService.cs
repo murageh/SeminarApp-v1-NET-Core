@@ -8,15 +8,21 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SeminarIntegration.Data;
 using SeminarIntegration.DTOs;
-using SeminarIntegration.DTOs.Auth;
+using SeminarIntegration.DTOs.Authentication;
 using SeminarIntegration.Interfaces;
 using SeminarIntegration.Models;
 using SeminarIntegration.Utils;
 
 namespace SeminarIntegration.Services.Auth
 {
-    public class AuthService(UserDbContext context, ILogger<UserService> logger, IMapper mapper, IConfiguration config, IOptions<AuthSettings> _authSettings, IUserService userService)
-    : IAuthService
+    public class AuthService(
+        UserDbContext context,
+        ILogger<UserService> logger,
+        IMapper mapper,
+        IConfiguration config,
+        IOptions<AuthSettings> _authSettings,
+        IUserService userService)
+        : IAuthService
     {
         private readonly AuthSettings authSettings = _authSettings.Value;
         private const int ExpiresInSeconds = 6 * 60 * 60; // 6 hours
@@ -24,10 +30,9 @@ namespace SeminarIntegration.Services.Auth
         public string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(authSettings.SecretKey ?? throw new InvalidOperationException("Could not find PrivateKey at appsettings.json. Refer to documentation on setting it up."));
-            var credentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature);
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("123456789ABCDEF101112131415161718191A"));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -36,6 +41,8 @@ namespace SeminarIntegration.Services.Auth
                 Subject = GenerateClaims(user),
                 Expires = DateTime.UtcNow.AddSeconds(ExpiresInSeconds), // Token expires in 6 hours
                 SigningCredentials = credentials,
+                IssuedAt = DateTime.UtcNow,
+                IncludeKeyIdInHeader = true,
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -48,7 +55,7 @@ namespace SeminarIntegration.Services.Auth
             claims.AddClaim(new Claim(ClaimTypes.Name, user.Username));
             claims.AddClaim(new Claim(ClaimTypes.Actor, user.Uuid.ToString()));
 
-            foreach (var role in user.Role.Split(";"))
+            foreach (var role in user.Role.Split(","))
             {
                 claims.AddClaim(new Claim(ClaimTypes.Role, role));
             }
@@ -68,14 +75,20 @@ namespace SeminarIntegration.Services.Auth
             return new AuthDTOs.TokenResponse()
             {
                 Token = token,
+                IssuedAt = DateTime.UtcNow,
                 ExpiresIn = ExpiresInSeconds,
                 RefreshToken = ""
             };
         }
-        
+
         public async Task<NormalUserResponse> RegisterUser(NewUserRequest newUserRequest)
         {
             return await userService.CreateUser(newUserRequest);
+        }
+
+        public async Task<NormalUserResponse> GetUserProfile(string username)
+        {
+            return await userService.GetUser(username);
         }
     }
 }

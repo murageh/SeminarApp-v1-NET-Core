@@ -36,7 +36,7 @@ namespace SeminarIntegration.Controllers
         [HttpGet]
         [ActionName("all")]
         [EndpointDescription("Fetches all users")]
-        [Authorize(Policy = "User")]
+        // [Authorize(Policy = "User")]
         public async Task<IActionResult> GetUsers()
         {
             return await _helpers.HandleRequestAsync(

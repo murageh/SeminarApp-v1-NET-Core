@@ -1,6 +1,6 @@
 ﻿using SeminarIntegration.DTOs;
 using System.Security.Claims;
-using SeminarIntegration.DTOs.Auth;
+using SeminarIntegration.DTOs.Authentication;
 
 namespace SeminarIntegration.Interfaces
 {
@@ -9,5 +9,6 @@ namespace SeminarIntegration.Interfaces
         string GenerateToken(User user);
         Task<AuthDTOs.TokenResponse> AuthenticateUserAndReturnToken(string username, string password);
         public Task<NormalUserResponse> RegisterUser(NewUserRequest newUserRequest);
+        public Task<NormalUserResponse> GetUserProfile(string username);
     }
 }
