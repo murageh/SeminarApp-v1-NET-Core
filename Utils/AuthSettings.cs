@@ -1,7 +1,6 @@
-﻿namespace SeminarIntegration.Utils
+﻿namespace SeminarIntegration.Utils;
+
+public class AuthSettings
 {
-    public class AuthSettings
-    {
-        public string SecretKey { get; set; }
-    }
+    public string SecretKey { get; set; }
 }

@@ -1,13 +1,12 @@
-﻿namespace SeminarIntegration.DTOs.Authentication
+﻿namespace SeminarIntegration.DTOs.Authentication;
+
+public class AuthDTOs
 {
-    public class AuthDTOs
+    public class TokenResponse
     {
-        public class TokenResponse
-        {
-            public string Token { get; set; }
-            public DateTime IssuedAt { get; set; }
-            public int ExpiresIn { get; set; }
-            public string? RefreshToken { get; set; }
-        }
+        public string Token { get; set; }
+        public DateTime IssuedAt { get; set; }
+        public int ExpiresIn { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }

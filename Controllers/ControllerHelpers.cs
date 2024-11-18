@@ -36,7 +36,8 @@ public class ControllerHelpers : ControllerBase
                 Message = ex.Message
             };
             return StatusCode(response.StatusCode, response);
-        }catch (ValidationException ex)
+        }
+        catch (ValidationException ex)
         {
             response = new AppResponse<T>.ErrorResponse
             {
