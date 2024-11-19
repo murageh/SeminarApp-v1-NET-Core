@@ -68,4 +68,56 @@ public interface ISeminar
     /// <param name="seminar"></param>
     /// <returns></returns>
     Task<dynamic> UpdateSeminar(Seminar seminar);
+
+    /// <summary>
+    ///     Retrieves all general product posting groups.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the general product posting groups.</returns>
+    Task<dynamic> GetGenProdPostingGroups();
+
+    /// <summary>
+    ///     Retrieves all VAT product posting groups.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the VAT product posting groups.</returns>
+    Task<dynamic> GetVATProdPostingGroups();
+
+    /// <summary>
+    ///     Retrieves all contacts for a specific company.
+    /// </summary>
+    /// <param name="companyName">The name of the company.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the contacts.</returns>
+    Task<dynamic> GetContacts(string companyName);
+
+    /// <summary>
+    ///     Retrieves all available seminars.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the available seminars.</returns>
+    Task<dynamic> GetAvailableSeminars();
+
+    /// <summary>
+    ///     Retrieves a single available seminar using the seminar number.
+    /// </summary>
+    /// <param name="seminarNo">The seminar number.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the available seminar.</returns>
+    Task<dynamic> GetAvailableSeminar(string seminarNo);
+
+    /// <summary>
+    ///     Adds a seminar registration.
+    /// </summary>
+    /// <param name="semNo">The seminar number.</param>
+    /// <param name="companyNo">The company number.</param>
+    /// <param name="participantContactNo">The contact number of the participant.</param>
+    /// <param name="name">The name of the participant.</param>
+    /// <param name="confirmation">Confirmation status.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the registration response.</returns>
+    Task<dynamic> CreateSeminarRegistration(string semNo, string companyNo, string participantContactNo, bool? confirmation);
+
+    /// <summary>
+    ///     Updates a seminar registration.
+    /// </summary>
+    /// <param name="semNo">The seminar number.</param>
+    /// <param name="lineNo">The line number of the registration.</param>
+    /// <param name="confirmed">Confirmation status.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the registration response.</returns>
+    Task<dynamic> UpdateSeminarRegistration(string semNo, int lineNo, bool confirmed);
 }

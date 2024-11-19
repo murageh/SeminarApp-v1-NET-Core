@@ -10,6 +10,8 @@ public class FilterHelper
     {
         if (string.IsNullOrEmpty(filter) || string.IsNullOrEmpty(value)) return string.Empty;
 
+        value = Uri.EscapeDataString(value.Replace("'", "''"));
+
         return isFirst
             ? $"?$filter={filter} eq '{value}'"
             : $" and {filter} eq '{value}'";

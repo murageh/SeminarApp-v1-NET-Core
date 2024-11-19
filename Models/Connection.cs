@@ -11,7 +11,12 @@ public class Connection
     public const string BaseUri = "http://murageh:7048/BC240/ODataV4/Company('CRONUS%20International%20Ltd.')/";
     public const string EmpPath = "EmpList";
     public const string CustPath = "CustList";
+    public const string ContactsPath = "ContactList";
     public const string SemListPath = "SeminarList";
+    public const string AvailableSeminarsPath = "AvailableSeminars";
+    public const string GenProdPostingGroupsPath = "GenProdPostingGrps";
+    public const string VATProdPostingGroupsPath = "VATProdPostingGrps";
+
     private static IConfiguration _config;
 
     public static bool ShouldAuthenticateExternally;

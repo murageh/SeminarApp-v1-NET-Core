@@ -2,10 +2,11 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using SeminarIntegration.DTOs;
 using SeminarIntegration.Interfaces;
 using SeminarIntegration.Models;
 using SeminarIntegration.Utils;
-using static SeminarIntegration.Services.SeminarResponse;
+using static SeminarIntegration.Services.BcJsonResponse;
 
 namespace SeminarIntegration.Services;
 
@@ -18,7 +19,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     {
         var functionName = "CreateSeminar";
         var url = GenerateUnboundSeminarUrl(functionName);
-        var responseWrapper = await HttpHelper.SendPostRequest<SeminarResponse>(url,
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
             new
             {
                 Name, SeminarDuration, SeminarPrice
@@ -52,7 +53,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     // {
     //     var functionName = "CreateSeminar";
     //     var url = GenerateUnboundSeminarUrl(functionName);
-    //     var responseWrapper = await HttpHelper.SendPostRequest<SeminarResponse>(url, seminar);
+    //     var responseWrapper = await HttpHelper.SendPostRequest<BCSeminarResponse>(url, seminar);
     //
     //     return new
     //     {
@@ -60,7 +61,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     //         message = responseWrapper.IsSuccess ? "Operation successful." : responseWrapper.ErrorMessage,
     //         statusCode = responseWrapper.StatusCode,
     //         data = responseWrapper.Data?.value != null
-    //             ? JsonConvert.DeserializeObject<SeminarResponse.SeminarResponseValue>(responseWrapper.Data.value)
+    //             ? JsonConvert.DeserializeObject<BCSeminarResponse.SeminarResponseValue>(responseWrapper.Data.value)
     //             : null
     //     };
     // }
@@ -69,7 +70,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     {
         // // unbound actions - does not work since thsi is a GET reques. Unbound actions only accept POST
         // var url = $"{config["AppSettings:PORTALCODEUNIT"]}GetSeminars?company={config["AppSettings:BCOMPANY"]}";
-        // var responseWrapper = await HttpHelper.SendGetRequest<SeminarResponse>(url);
+        // var responseWrapper = await HttpHelper.SendGetRequest<BCSeminarResponse>(url);
         //
         // return new
         // {
@@ -109,7 +110,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         // ODatav4 (Page WS)
         var url = $"{Connection.BaseUri}{Connection.SemListPath}";
 
-        var responseWrapper = await HttpHelper.SendGetRequest<SeminarResponse>(url);
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
         if (!responseWrapper.IsSuccess)
             return new
@@ -141,7 +142,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         url += FilterHelper.GenerateFilter("No", seminarNo, true);
 
-        var responseWrapper = await HttpHelper.SendGetRequest<SeminarResponse>(url);
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
         if (!responseWrapper.IsSuccess)
             return new
@@ -202,7 +203,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         var functionName = AreOptionalFieldsDefined ? "UpdateSeminarWithGroups" : "UpdateSeminar";
 
         var url = GenerateUnboundSeminarUrl(functionName);
-        var responseWrapper = await HttpHelper.SendPostRequest<SeminarResponse>
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>
         (
             url,
             AreOptionalFieldsDefined
@@ -243,7 +244,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     {
         var functionName = "DeleteSeminar";
         var url = GenerateUnboundSeminarUrl(functionName);
-        var responseWrapper = await HttpHelper.SendPostRequest<SeminarResponse>
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>
         (
             url, new
             {
@@ -292,6 +293,223 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         throw new NotImplementedException();
     }
 
+    public async Task<dynamic> GetAvailableSeminars()
+    {
+        var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}";
+
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract available seminars
+        JToken? tk = responseWrapper.Data?.value;
+        var availableSeminars = tk?.ToObject<List<AvailableSeminar>>();
+
+        return new
+        {
+            success = true,
+            message = "Operation successful.",
+            statusCode = HttpStatusCode.OK,
+            data = availableSeminars
+        };
+    }
+
+    public async Task<dynamic> GetAvailableSeminar(string seminarNo)
+    {
+        var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}({seminarNo})";
+
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract available seminar
+        JToken? tk = responseWrapper.Data?.value;
+        var availableSeminar = tk?.ToObject<AvailableSeminar>();
+
+        return new
+        {
+            success = true,
+            message = "Operation successful.",
+            statusCode = HttpStatusCode.OK,
+            data = availableSeminar
+        };
+    }
+
+    public async Task<dynamic> CreateSeminarRegistration(string semNo, string companyNo, string participantContactNo, bool? confirmed=false)
+    {
+        var functionName = "CreateSeminarRegistration";
+        var url = GenerateUnboundSeminarUrl(functionName);
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
+            new
+            {
+                semNo,
+                companyNo,
+                participantContactNo,
+                confirmed
+            }
+        );
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract registration response
+        SeminarResponseValue? regResponse =
+            JsonConvert.DeserializeObject<AvailableSeminarsResponse>(responseWrapper.Data?.value);
+        var registration = ExtractAvailableSeminarFromResponseWrapper(regResponse);
+
+        return new
+        {
+            success = true,
+            message = regResponse.message ?? "Operation successful.",
+            statusCode = regResponse.status,
+            data = registration
+        };
+    }
+
+    public async Task<dynamic> UpdateSeminarRegistration(string semNo, int lineNo, bool confirmed)
+    {
+        var functionName = "UpdateSeminarRegistration";
+        var url = GenerateUnboundSeminarUrl(functionName);
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
+            new
+            {
+                semNo,
+                lineNo,
+                confirmed
+            }
+        );
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract registration response
+        SeminarResponseValue? regResponse =
+            JsonConvert.DeserializeObject<AvailableSeminarsResponse>(responseWrapper.Data?.value);
+        var registration = ExtractAvailableSeminarFromResponseWrapper(regResponse);
+
+        return new
+        {
+            success = true,
+            message = regResponse.message ?? "Operation successful.",
+            statusCode = regResponse.status,
+            data = registration
+        };
+    }
+
+    public async Task<dynamic> GetGenProdPostingGroups()
+    {
+        var url = $"{Connection.BaseUri}{Connection.GenProdPostingGroupsPath}";
+
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract GenProdPostingGroups
+        JToken? tk = responseWrapper.Data?.value;
+        var genProdPostingGroups = tk?.ToObject<List<GenProdPostingGroupDto>>();
+
+        return new
+        {
+            success = true,
+            message = "Operation successful.",
+            statusCode = HttpStatusCode.OK,
+            data = genProdPostingGroups
+        };
+    }
+
+    public async Task<dynamic> GetVATProdPostingGroups()
+    {
+        var url = $"{Connection.BaseUri}{Connection.VATProdPostingGroupsPath}";
+
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract VATProdPostingGroups
+        JToken? tk = responseWrapper.Data?.value;
+        var vatProdPostingGroups = tk?.ToObject<List<VATProdPostingGroupDto>>();
+
+        return new
+        {
+            success = true,
+            message = "Operation successful.",
+            statusCode = HttpStatusCode.OK,
+            data = vatProdPostingGroups
+        };
+    }
+
+    public async Task<dynamic> GetContacts(string companyName)
+    {
+        var url = $"{Connection.BaseUri}{Connection.ContactsPath}";
+        if (!string.IsNullOrEmpty(companyName))
+        {
+            url += FilterHelper.GenerateFilter("Company_Name", companyName, true);
+        }
+
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+
+        if (!responseWrapper.IsSuccess)
+            return new
+            {
+                success = false,
+                message = responseWrapper.ErrorMessage,
+                statusCode = responseWrapper.StatusCode,
+                data = new { }
+            };
+
+        // extract contacts
+        JToken? tk = responseWrapper.Data?.value;
+        var contacts = tk?.ToObject<List<Contact>>();
+
+        return new
+        {
+            success = true,
+            message = "Operation successful.",
+            statusCode = HttpStatusCode.OK,
+            data = contacts
+        };
+    }
+
     private string GenerateUnboundSeminarUrl(string functionName)
     {
         return $"{config["AppSettings:PORTALCODEUNIT"]}{functionName}?company={config["AppSettings:BCOMPANY"]}";
@@ -303,6 +521,14 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         JToken? tk = res.data;
         return tk?.ToObject<Seminar>() ?? new Seminar();
     }
+
+    private AvailableSeminar? ExtractAvailableSeminarFromResponseWrapper(SeminarResponseValue? res)
+    {
+        if (res == null) return default;
+        JToken? tk = res.data;
+        return tk?.ToObject<AvailableSeminar>() ?? new AvailableSeminar();
+    }
+
 }
 
 public class Seminar
@@ -320,14 +546,45 @@ public class Seminar
     public string? VAT_Prod_Posting_Group { get; set; }
 }
 
-public class SeminarResponse
+public class BcJsonResponse
 {
     public dynamic value { get; set; }
+}
 
-    public class SeminarResponseValue
-    {
-        public int status { get; set; }
-        public string message { get; set; }
-        public dynamic? data { get; set; }
-    }
+public class SeminarResponseValue
+{
+    public int status { get; set; }
+    public string message { get; set; }
+    public dynamic? data { get; set; }
+}
+
+public class GenProdPostingGroupDto
+{
+    public string Code { get; set; }
+    public string Description { get; set; }
+    public string Def_VAT_Prod_Posting_Group { get; set; }
+    public bool Auto_Insert_Default { get; set; }
+}
+public class VATProdPostingGroupDto
+{
+    public string Code { get; set; }
+    public string Description { get; set; }
+}
+
+public class AvailableSeminar
+{
+    public string No { get; set; }
+    public DateTime Starting_Date { get; set; }
+    public string Seminar_No { get; set; }
+    public string Seminar_Name { get; set; }
+    public string Status { get; set; }
+    public int Duration { get; set; }
+    public int Maximum_Participants { get; set; }
+    public string Room_Resource_No { get; set; }
+    public int Registered_Participants { get; set; }
+}
+
+public class AvailableSeminarsResponse
+{
+    public List<AvailableSeminar> value { get; set; }
 }

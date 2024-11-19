@@ -10,7 +10,7 @@ namespace SeminarIntegration.Controllers;
 public class CustomerController : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> GetCustomers(int? top = 5, int? skip = 0)
+    public async Task<IActionResult> GetCustomers(int? top = int.MaxValue, int? skip = 0)
     {
         List<Customer> customers;
         try
