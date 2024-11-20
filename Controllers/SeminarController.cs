@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SeminarIntegration.DTOs;
 using SeminarIntegration.Interfaces;
 using SeminarIntegration.Services;
 
@@ -17,7 +18,8 @@ public class SeminarController(ISeminar seminar) : Controller
     public async Task<dynamic> GetSeminars()
     {
         var response = await seminar.GetSeminars();
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("{seminarNo}")]
@@ -27,7 +29,8 @@ public class SeminarController(ISeminar seminar) : Controller
     public async Task<dynamic> GetSeminar(string seminarNo)
     {
         var response = await seminar.GetSeminar(seminarNo);
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("AvailableSeminars")]
@@ -37,96 +40,119 @@ public class SeminarController(ISeminar seminar) : Controller
     public async Task<dynamic> GetAvailableSeminars()
     {
         var response = await seminar.GetAvailableSeminars();
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("AvailableSeminars/{seminarNo}")]
     [ActionName("AvailableSeminar")]
     [EndpointDescription("Fetches a specific available seminar")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetAvailableSeminar(string seminarNo)
+    public async Task<IActionResult> GetAvailableSeminar(string seminarNo)
     {
         var response = await seminar.GetAvailableSeminar(seminarNo);
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPost("Registration")]
     [ActionName("CreateSeminarRegistration")]
     [EndpointDescription("Adds a seminar registration")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> AddSeminarRegistration(string semNo, string companyNo, string participantContactNo, bool confirmed)
+    public async Task<IActionResult> AddSeminarRegistration(SeminarRegistrationDto newSem)
     {
-        var response = await seminar.CreateSeminarRegistration(semNo, companyNo, participantContactNo, confirmed);
-        return Ok(response);
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var response = await seminar.CreateSeminarRegistration(newSem.SemNo, newSem.CompanyNo, newSem.ParticipantContactNo, newSem.Confirmed);
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPatch("Registration")]
     [ActionName("UpdateSeminarRegistration")]
     [EndpointDescription("Updates a seminar registration")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> UpdateSeminarRegistration(string semNo, int lineNo, bool confirmed)
+    public async Task<IActionResult> UpdateSeminarRegistration(SeminarUpdateDto reqDto)
     {
-        var response = await seminar.UpdateSeminarRegistration(semNo, lineNo, confirmed);
-        return Ok(response);
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var response = await seminar.UpdateSeminarRegistration(reqDto.SemNo, reqDto.LineNo, reqDto.Confirmed);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
+    }
+
+    [HttpGet("MyRegistrations")]
+    [ActionName("GetMyRegistrations")]
+    [EndpointDescription("Fetches seminar registrations for a specific participant and seminar")]
+    [Authorize(Policy = "User")]
+    public async Task<IActionResult> GetMyRegistrations(string participantContactNo, string? seminarNo="")
+    {
+        var response = await seminar.GetSeminarRegistrations(participantContactNo, seminarNo);
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPost]
     [ActionName("CreateSeminar")]
     [EndpointDescription("Creates a seminar")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> CreateSeminar(string Name, int SeminarDuration, int SeminarPrice)
+    public async Task<IActionResult> CreateSeminar(string Name, int SeminarDuration, int SeminarPrice)
     {
         var response = await seminar.CreateSeminar(Name, SeminarDuration, SeminarPrice);
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPatch]
     [ActionName("UpdateSeminar")]
     [EndpointDescription("Updates an existing Seminar")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> PostDataToBc(Seminar data)
+    public async Task<IActionResult> PostDataToBc(Services.Seminar data)
     {
         var response = await seminar.UpdateSeminar(data);
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpDelete("{seminarNo}")]
     [ActionName("DeleteSeminar")]
     [EndpointDescription("basically sets a seminar `Blocked` value to True. Does not actually delete it.")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> DeleteSeminar(string seminarNo)
+    public async Task<IActionResult> DeleteSeminar(string seminarNo)
     {
         var response = await seminar.DeleteSeminar(seminarNo);
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("GenProdPostingGroups")]
     [ActionName("GenProdPostingGroups")]
     [EndpointDescription("Fetches all general product posting groups")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetGenProdPostingGroups()
+    public async Task<IActionResult> GetGenProdPostingGroups()
     {
         var response = await seminar.GetGenProdPostingGroups();
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("VATProdPostingGroups")]
     [ActionName("VATProdPostingGroups")]
     [EndpointDescription("Fetches all VAT product posting groups")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetVATProdPostingGroups()
+    public async Task<IActionResult> GetVATProdPostingGroups()
     {
         var response = await seminar.GetVATProdPostingGroups();
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("Contacts/{companyName}")]
     [ActionName("Contacts")]
     [EndpointDescription("Fetches all contacts for a specific company")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetContacts(string companyName)
+    public async Task<IActionResult> GetContacts(string companyName)
     {
         var response = await seminar.GetContacts(companyName);
-        return Ok(response);
+        response.Path = HttpContext.Request.Path; 
+        return StatusCode(response.StatusCode, response);
     }
 }

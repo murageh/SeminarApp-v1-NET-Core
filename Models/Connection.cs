@@ -17,6 +17,9 @@ public class Connection
     public const string GenProdPostingGroupsPath = "GenProdPostingGrps";
     public const string VATProdPostingGroupsPath = "VATProdPostingGrps";
 
+    // registrations
+    public const string SeminarRegistrationsPath = "SeminarRegistrations";
+
     private static IConfiguration _config;
 
     public static bool ShouldAuthenticateExternally;

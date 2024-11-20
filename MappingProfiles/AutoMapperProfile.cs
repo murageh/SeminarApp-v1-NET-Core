@@ -32,5 +32,18 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.LastName, opt => opt.Condition(src => src.LastName != null))
             .ForMember(dest => dest.Title, opt => opt.Condition(src => src.Title != null))
             ;
+
+        // Add mapping for SeminarRegistrationRespItem
+        CreateMap<SemRegistrationODataItem, SeminarRegistrationRespItem>()
+            .ForMember(dest => dest.SeminarNo, opt => opt.MapFrom(src => src.Document_No))
+            .ForMember(dest => dest.LineNo, opt => opt.MapFrom(src => src.Line_No))
+            .ForMember(dest => dest.CompanyNo, opt => opt.MapFrom(src => src.Bill_to_Customer_No))
+            .ForMember(dest => dest.ParticipantContactNo, opt => opt.MapFrom(src => src.Participant_Contact_No))
+            .ForMember(dest => dest.ParticipantName, opt => opt.MapFrom(src => src.Participant_Name))
+            .ForMember(dest => dest.ToInvoice, opt => opt.MapFrom(src => src.To_Invoice))
+            .ForMember(dest => dest.RegistrationDate, opt => opt.MapFrom(src => src.Registration_Date))
+            .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => src.Amount))
+            .ForMember(dest => dest.ConfirmationStatus, opt => opt.MapFrom(src => src.Confirmation_Status))
+            .ForMember(dest => dest.DiscountAmount, opt => opt.MapFrom(src => src.Discount_Amount));
     }
 }

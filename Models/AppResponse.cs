@@ -21,4 +21,27 @@ public class AppResponse<T>
     {
         public override bool Success { get; set; } = false;
     }
+
+    public static SuccessResponse Success(T data, string message, int statusCode, string title, string path)
+    {
+        return new SuccessResponse
+        {
+            Data = data,
+            Message = message,
+            StatusCode = statusCode,
+            Title = title,
+            Path = path
+        };
+    }
+
+    public static ErrorResponse Failure(string message, int statusCode, string title, string path)
+    {
+        return new ErrorResponse
+        {
+            Message = message,
+            StatusCode = statusCode,
+            Title = title,
+            Path = path
+        };
+    }
 }
