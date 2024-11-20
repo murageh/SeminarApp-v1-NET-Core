@@ -18,7 +18,6 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.FullName, opt => opt.Ignore())
             .ForMember(dest => dest.Role, opt => opt.Ignore())
             .ForMember(dest => dest.PreviouslyDeleted, opt => opt.Ignore())
             ;
@@ -28,9 +27,7 @@ public class AutoMapperProfile : Profile
         CreateMap<User, ElevatedNormalUserResponse>();
 
         CreateMap<UpdateUserRequest, User>()
-            .ForMember(dest => dest.FirstName, opt => opt.Condition(src => src.FirstName != null))
-            .ForMember(dest => dest.LastName, opt => opt.Condition(src => src.LastName != null))
-            .ForMember(dest => dest.Title, opt => opt.Condition(src => src.Title != null))
+            .ForMember(dest => dest.Name, opt => opt.Condition(src => src.Name != null))
             ;
 
         // Add mapping for SeminarRegistrationRespItem

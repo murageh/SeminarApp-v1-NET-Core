@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
-using SeminarIntegration.Data;
 using SeminarIntegration.Interfaces;
 using SeminarIntegration.Middleware;
 using SeminarIntegration.Models;
@@ -85,9 +84,6 @@ public class Program
                 });
             });
 
-        // Register the database settings
-        builder.Services.Configure<DbSettings>(builder.Configuration.GetSection("DbSettings"));
-        builder.Services.AddSingleton<UserDbContext>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
         builder.Services.AddScoped<IAuthService, AuthService>();
@@ -106,6 +102,11 @@ public class Program
          * Register CustomerService with HttpClient and default credentials.
          */
         builder.Services.AddHttpClient<SeminarService>()
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                UseDefaultCredentials = true
+            });
+        builder.Services.AddHttpClient<UserService>()
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 UseDefaultCredentials = true

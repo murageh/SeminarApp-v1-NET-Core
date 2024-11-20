@@ -9,6 +9,7 @@ namespace SeminarIntegration.Models;
 public class Connection
 {
     public const string BaseUri = "http://murageh:7048/BC240/ODataV4/Company('CRONUS%20International%20Ltd.')/";
+    public const string AppUserListPath = "AppUsers";
     public const string EmpPath = "EmpList";
     public const string CustPath = "CustList";
     public const string ContactsPath = "ContactList";

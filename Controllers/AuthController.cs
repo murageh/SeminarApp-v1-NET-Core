@@ -1,8 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SeminarIntegration.DTOs;
+using SeminarIntegration.DTOs.Authentication;
 using SeminarIntegration.Interfaces;
+using SeminarIntegration.Models;
 
 namespace SeminarIntegration.Controllers;
 
@@ -17,57 +20,70 @@ public class AuthController(IAuthService authService) : Controller
     [HttpPost("register")]
     [ActionName("register")]
     [EndpointDescription("Registers a user into the system")]
-    public async Task<IActionResult> Register(NewUserRequest newUserRequest)
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> Register(NewUserRequest newUserRequest)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+            return new AppResponse<NormalUserResponse>.ErrorResponse()
+            {
+                Title = "Registration", Message = "Invalid request.", Path = HttpContext.Request.Path,
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
 
-        return await _helpers.HandleRequestAsync(
-            () => authService.RegisterUser(newUserRequest),
-            "Logging in",
-            "User logged in successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var res = await authService.RegisterUser(newUserRequest);
+        res.Path = HttpContext.Request.Path;
+        return res;
     }
 
     [HttpPost("login")]
     [ActionName("login")]
     [EndpointDescription("Logs in a user")]
-    public async Task<IActionResult> Login(LoginRequest loginRequest)
+    public async Task<AppResponse<AuthDTOs.TokenResponse>.BaseResponse> Login(LoginRequest loginRequest)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+            return new AppResponse<AuthDTOs.TokenResponse>.ErrorResponse()
+            {
+                Title = "Login",
+                Message = "Invalid request.",
+                Path = HttpContext.Request.Path,
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
 
-        return await _helpers.HandleRequestAsync(
-            () => authService.AuthenticateUserAndReturnToken(loginRequest.Username, loginRequest.Password),
-            "Logging in",
-            "User logged in successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var res = await authService.AuthenticateUserAndReturnToken(loginRequest.Username, loginRequest.Password);
+        res.Path = HttpContext.Request.Path;
+        return res;
     }
 
     [HttpGet("profile")]
     [Authorize]
     [ActionName("profile")]
     [EndpointDescription("Gets the current user profile")]
-    public async Task<IActionResult> GetProfile()
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> GetProfile()
     {
         var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
         if (authHeader == null || !authHeader.StartsWith("Bearer "))
-            return Unauthorized("Invalid Authorization header.");
+            return new AppResponse<NormalUserResponse>.ErrorResponse()
+            {
+                Title = "Profile",
+                Message = "Invalid token.",
+                Path = HttpContext.Request.Path,
+                StatusCode = (int)HttpStatusCode.Unauthorized
+            };
 
         var token = authHeader.Substring("Bearer ".Length).Trim();
         var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
         var username = jwtToken?.Claims.FirstOrDefault(claim => claim.Type == "unique_name")?.Value;
 
-        if (string.IsNullOrEmpty(username)) return Unauthorized("Invalid token.");
+        if (string.IsNullOrEmpty(username))
+            return new AppResponse<NormalUserResponse>.ErrorResponse()
+            {
+                Title = "Profile",
+                Message = "Invalid token.",
+                Path = HttpContext.Request.Path,
+                StatusCode = (int)HttpStatusCode.Unauthorized
+            };
 
-        return await _helpers.HandleRequestAsync(
-            () => authService.GetUserProfile(username),
-            "Finding user",
-            "User found successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var res = await authService.GetUserProfile(username);
+        res.Path = HttpContext.Request.Path;
+        return res;
     }
 }

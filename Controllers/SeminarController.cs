@@ -15,7 +15,7 @@ public class SeminarController(ISeminar seminar) : Controller
     [ActionName("allSeminars")]
     [EndpointDescription("Fetches all seminars")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetSeminars()
+    public async Task<IActionResult> GetSeminars()
     {
         var response = await seminar.GetSeminars();
         response.Path = HttpContext.Request.Path; 
@@ -26,7 +26,7 @@ public class SeminarController(ISeminar seminar) : Controller
     [ActionName("Seminar")]
     [EndpointDescription("Fetches a specific seminar")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetSeminar(string seminarNo)
+    public async Task<IActionResult> GetSeminar(string seminarNo)
     {
         var response = await seminar.GetSeminar(seminarNo);
         response.Path = HttpContext.Request.Path; 
@@ -37,7 +37,7 @@ public class SeminarController(ISeminar seminar) : Controller
     [ActionName("AvailableSeminars")]
     [EndpointDescription("Fetches all available seminars. fetches headers, as opposed to the previous methods.")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetAvailableSeminars()
+    public async Task<IActionResult> GetAvailableSeminars()
     {
         var response = await seminar.GetAvailableSeminars();
         response.Path = HttpContext.Request.Path; 

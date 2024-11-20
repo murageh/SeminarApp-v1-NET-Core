@@ -14,13 +14,14 @@ namespace SeminarIntegration.Services;
 public class SeminarService(HttpClient httpClient, IConfiguration config, Credentials credentials, IMapper mapper)
     : ISeminar
 {
+    private readonly UrlHelper _urlHelper = new(config);
     private static CamelCasePropertyNamesContractResolver? CamelCaseOptions;
 
     public async Task<AppResponse<Seminar>.BaseResponse> CreateSeminar(string Name, int SeminarDuration,
         int SeminarPrice)
     {
         var functionName = "CreateSeminar";
-        var url = GenerateUnboundSeminarUrl(functionName);
+        var url = _urlHelper.GenerateUnboundUrl(functionName);
         var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
             new
             {
@@ -46,7 +47,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     // public async Task<dynamic> CreateSeminar(Seminar seminar)
     // {
     //     var functionName = "CreateSeminar";
-    //     var url = GenerateUnboundSeminarUrl(functionName);
+    //     var url = _urlHelper.GenerateUnboundUrl(functionName);
     //     var responseWrapper = await HttpHelper.SendPostRequest<BCSeminarResponse>(url, seminar);
     //
     //     return new
@@ -165,7 +166,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
                                        !string.IsNullOrEmpty(seminar.VAT_Prod_Posting_Group);
         var functionName = AreOptionalFieldsDefined ? "UpdateSeminarWithGroups" : "UpdateSeminar";
 
-        var url = GenerateUnboundSeminarUrl(functionName);
+        var url = _urlHelper.GenerateUnboundUrl(functionName);
         var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>
         (
             url,
@@ -196,7 +197,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     public async Task<AppResponse<object>.BaseResponse> DeleteSeminar(string seminarNo)
     {
         var functionName = "DeleteSeminar";
-        var url = GenerateUnboundSeminarUrl(functionName);
+        var url = _urlHelper.GenerateUnboundUrl(functionName);
         var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>
         (
             url, new
@@ -275,7 +276,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         string companyNo, string participantContactNo, bool? confirmed = false)
     {
         var functionName = "CreateSeminarRegistration";
-        var url = GenerateUnboundSeminarUrl(functionName);
+        var url = _urlHelper.GenerateUnboundUrl(functionName);
         var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
             new
             {
@@ -304,7 +305,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         bool confirmed)
     {
         var functionName = "UpdateSeminarRegistration";
-        var url = GenerateUnboundSeminarUrl(functionName);
+        var url = _urlHelper.GenerateUnboundUrl(functionName);
         var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
             new
             {
@@ -400,11 +401,6 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         return AppResponse<List<Contact>>.Success(contacts, "Operation successful.", (int)HttpStatusCode.OK,
             "Get Contacts Success", url);
-    }
-
-    private string GenerateUnboundSeminarUrl(string functionName)
-    {
-        return $"{config["AppSettings:PORTALCODEUNIT"]}{functionName}?company={config["AppSettings:BCOMPANY"]}";
     }
 
     private Seminar? ExtractSeminarFromResponseWrapper(SeminarResponseValue? res)
