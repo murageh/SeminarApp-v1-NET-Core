@@ -116,11 +116,11 @@ public interface ISeminar
     /// <summary>
     ///     Updates a seminar registration.
     /// </summary>
-    /// <param name="semNo">The seminar number.</param>
+    /// <param name="semHeaderNo">The seminar number.</param>
     /// <param name="lineNo">The line number of the registration.</param>
     /// <param name="confirmed">Confirmation status.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the registration response.</returns>
-    Task<AppResponse<AvailableSeminar>.BaseResponse> UpdateSeminarRegistration(string semNo, int lineNo, bool confirmed);
+    Task<AppResponse<SeminarRegistrationItem>.BaseResponse> UpdateSeminarRegistration(string semHeaderNo, int lineNo, bool confirmed);
 
     /// <summary>
     ///     Retrieves seminar registrations for a specific participant and seminar.

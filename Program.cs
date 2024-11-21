@@ -37,9 +37,9 @@ public class Program
                             HeaderNames.AccessControlAllowHeaders,
                             HeaderNames.AccessControlAllowMethods,
                             "x-custom-header"
-                        );
-                    // .AllowAnyHeader()
-                    ;
+                        )
+                        .WithMethods("PATCH");
+                    // .AllowAnyHeader();
                 });
         });
 
@@ -147,8 +147,8 @@ public class Program
             });
         builder.Services.AddAuthorization(options =>
         {
-            options.AddPolicy("User", policy => policy.RequireRole("user"));
-            options.AddPolicy("Admin", policy => policy.RequireRole("admin"));
+            options.AddPolicy("User", policy => policy.RequireRole("User"));
+            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
         });
 
         var app = builder.Build();

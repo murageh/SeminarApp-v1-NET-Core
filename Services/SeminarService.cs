@@ -257,7 +257,8 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
     public async Task<AppResponse<AvailableSeminar>.BaseResponse> GetAvailableSeminar(string seminarNo)
     {
-        var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}({seminarNo})";
+        var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}";
+        url += FilterHelper.GenerateFilter("No", seminarNo, true);
         var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
         if (!responseWrapper.IsSuccess)
@@ -265,8 +266,13 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
                 "Get Available Seminar Failed", url);
 
         // extract available seminar
-        JToken? tk = responseWrapper.Data?.value;
-        var availableSeminar = tk?.ToObject<AvailableSeminar>();
+        // Use the format below
+        var result = responseWrapper.Data?.value.ToString();
+        var lst = JsonConvert.DeserializeObject<List<AvailableSeminar>>(result);
+        var availableSeminar = lst?.FirstOrDefault();
+        if (availableSeminar == null)
+            return AppResponse<AvailableSeminar>.Failure("Seminar not found.", (int)HttpStatusCode.NotFound,
+                "Get Available Seminar Failed", url);
 
         return AppResponse<AvailableSeminar>.Success(availableSeminar, "Operation successful.", (int)HttpStatusCode.OK,
             "Get Available Seminar Success", url);
@@ -292,8 +298,8 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
                 (int)responseWrapper.StatusCode, "Create Seminar Registration Failed", url);
 
         // extract registration response
-        SeminarRegistrationsResponseValue? regResponse =
-            JsonConvert.DeserializeObject<SeminarRegistrationsResponseValue>(responseWrapper.Data?.value);
+        var result = responseWrapper.Data?.value.ToString();
+        var regResponse = JsonConvert.DeserializeObject<SeminarRegistrationsResponseValue>(result);
         var registration = ExtractSeminarRegistrationFromResponseWrapper(regResponse);
 
         return AppResponse<SeminarRegistrationItem>.Success(registration,
@@ -301,30 +307,30 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
             "Create Seminar Registration Success", url);
     }
 
-    public async Task<AppResponse<AvailableSeminar>.BaseResponse> UpdateSeminarRegistration(string semNo, int lineNo,
+    public async Task<AppResponse<SeminarRegistrationItem>.BaseResponse> UpdateSeminarRegistration(string semHeaderNo, int lineNo,
         bool confirmed)
     {
-        var functionName = "UpdateSeminarRegistration";
+        var functionName = "UpdateSeminarConfirmation";
         var url = _urlHelper.GenerateUnboundUrl(functionName);
         var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
             new
             {
-                semNo,
+                semNo = semHeaderNo,
                 lineNo,
                 confirmed
             }
         );
 
         if (!responseWrapper.IsSuccess)
-            return AppResponse<AvailableSeminar>.Failure(responseWrapper.ErrorMessage, (int)responseWrapper.StatusCode,
+            return AppResponse<SeminarRegistrationItem>.Failure(responseWrapper.ErrorMessage, (int)responseWrapper.StatusCode,
                 "Update Seminar Registration Failed", url);
 
         // extract registration response
-        SeminarResponseValue? regResponse =
-            JsonConvert.DeserializeObject<AvailableSeminarsResponse>(responseWrapper.Data?.value);
-        var registration = ExtractAvailableSeminarFromResponseWrapper(regResponse);
+        var result = responseWrapper.Data?.value.ToString();
+        var regResponse = JsonConvert.DeserializeObject<SeminarRegistrationsResponseValue>(result);
+        var registration = ExtractSeminarRegistrationFromResponseWrapper(regResponse);
 
-        return AppResponse<AvailableSeminar>.Success(registration, regResponse.message ?? "Operation successful.",
+        return AppResponse<SeminarRegistrationItem>.Success(registration, regResponse.message ?? "Operation successful.",
             (int)regResponse.status, "Update Seminar Registration Success", url);
     }
 

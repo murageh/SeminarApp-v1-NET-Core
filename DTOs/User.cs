@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace SeminarIntegration.DTOs;
 
@@ -9,32 +10,24 @@ public class User
     ///     Authentication and authorization will be implemented using/from this class
     ///     UPDATE(20/11/2024): This User model will now be from Microsoft Dynamics BC
     /// </summary>
-    public User(string username,
-        string password,
-        string email,
-        string Name
-    )
-    {
-        Username = username;
-        Password = password;
-        Email = email;
-        Name = Name;
-        Role = "user";
-    }
-
     public string Uuid { get; set; }
+    [JsonProperty("Name")]
+    public dynamic Name { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
     public string Email { get; set; }
-    public string Name { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
-    public bool IsDeleted { get; set; } = false;
+    public string CreatedAt { get; set; }
+    public string UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
-    public DateTime? DeletedAt { get; set; }
+    public string? DeletedAt { get; set; }
     public bool PreviouslyDeleted { get; set; }
 
     public string Role { get; set; }
+
+    public string Customer_No { get; set; }
+    public string Customer_Name { get; set; }
+    public string Contact_No { get; set; }
+    public string Contact_Name { get; set; }
 
     // Util methods
     public bool IsAdmin()
@@ -77,15 +70,18 @@ public class NormalUserResponse
     public string Email { get; set; }
     public string Name { get; set; }
     public string Role { get; set; }
+    public string Customer_No { get; set; }
+    public string Customer_Name { get; set; }
+    public string Contact_No { get; set; }
+    public string Contact_Name { get; set; }
 }
 
 public class ElevatedNormalUserResponse : NormalUserResponse
 {
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
-    public bool IsDeleted { get; set; } = false;
+    public string CreatedAt { get; set; }
+    public string UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
-    public DateTime? DeletedAt { get; set; }
+    public string? DeletedAt { get; set; }
     public bool PreviouslyDeleted { get; set; }
 }
 
@@ -135,7 +131,7 @@ public class DeletedUserHistory
     public string Username { get; set; }
     public string Email { get; set; }
     public string Name { get; set; }
-    public DateTime DeletedAt { get; set; }
+    public string DeletedAt { get; set; }
 
 
     // factory method extract details from user. Accepts a user object
@@ -148,7 +144,7 @@ public class DeletedUserHistory
             Username = user.Username,
             Email = user.Email,
             Name = user.Name, 
-            DeletedAt = DateTime.UtcNow
+            DeletedAt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
         };
     }
 }

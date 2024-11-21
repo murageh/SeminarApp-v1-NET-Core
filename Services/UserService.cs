@@ -20,7 +20,7 @@ public class UserService(HttpClient httpClient, IConfiguration config, Credentia
     public async Task<AppResponse<List<NormalUserResponse>>.BaseResponse> GetUsersAsync()
     {
         var url = $"{Connection.BaseUri}{Connection.AppUserListPath}";
-        url += FilterHelper.GenerateFilter("IsDeleted", "false", true);
+        // url += FilterHelper.GenerateFilter("IsDeleted", "false", true); // TODO: Come back to this
 
         var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
@@ -75,9 +75,15 @@ public class UserService(HttpClient httpClient, IConfiguration config, Credentia
                 (int)responseWrapper.StatusCode,
                 "Get User Failed", url);
         // extract users
-        JToken? tk = responseWrapper.Data?.value;
-        var userList = tk?.ToObject<List<User>>();
-        if (userList == null)
+        // JToken? tk = responseWrapper.Data?.value;
+        // var userList = tk?.ToObject<List<User>>();
+        var result = responseWrapper.Data?.value.ToString();
+        List<User> userList = [];
+        foreach (var u in responseWrapper.Data?.value)
+        {
+           userList.Add(JsonConvert.DeserializeObject<User>(u.ToString())); 
+        }
+        if (userList.Count == 0)
             return AppResponse<NormalUserResponse>.Failure("User not found", (int)HttpStatusCode.NotFound,
                 "Get User Failed", url);
         var user = userList.FirstOrDefault();
