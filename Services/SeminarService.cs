@@ -241,6 +241,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     public async Task<AppResponse<List<AvailableSeminar>>.BaseResponse> GetAvailableSeminars()
     {
         var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}";
+        url += FilterHelper.GenerateFilter("Status", "Open", true);
         var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
         if (!responseWrapper.IsSuccess)
