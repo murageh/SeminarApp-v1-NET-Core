@@ -17,6 +17,22 @@ public class FilterHelper
             : $" and {filter} eq '{value}'";
     }
 
+    public static string GenerateOptionalFilter(string filter, IEnumerable<string> values, bool isFirst = false)
+    {
+        var enumerable = values as string[] ?? values.ToArray();
+        if (string.IsNullOrEmpty(filter) || !enumerable.Any()) return string.Empty;
+
+        // Escape and format each value for OData
+        var formattedValues = enumerable
+            .Select(value => $"({filter} eq '{Uri.EscapeDataString(value.Replace("'", "''"))}')");
+
+        // Join the conditions using 'or'
+        var filterExpression = string.Join(" or ", formattedValues);
+
+        // Prepend the filter keyword if it's the first filter
+        return isFirst ? $"?$filter={filterExpression}" : $" and ({filterExpression})";
+    }
+
     public static string GenerateFilter(string filter = "", int value = 0, bool isFirst = false)
     {
         if (string.IsNullOrEmpty(filter) || value == 0) return string.Empty;

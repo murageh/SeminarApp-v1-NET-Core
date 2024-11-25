@@ -118,7 +118,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
             "Get Seminars Success", url);
     }
 
-    public async Task<AppResponse<Seminar>.BaseResponse> GetSeminar(string seminarNo = "")
+    public async Task<AppResponse<Seminar>.BaseResponse> GetSeminar(string seminarNo)
     {
         var url = $"{Connection.BaseUri}{Connection.SemListPath}";
         if (string.IsNullOrEmpty(seminarNo))
@@ -135,9 +135,16 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         // extract seminar
         JToken? tk = responseWrapper.Data?.value;
         var semList = tk?.ToObject<List<Seminar>>();
+        var sem = semList?.FirstOrDefault();
+        if (sem == null)
+            return AppResponse<Seminar>.Failure("Seminar not found.", (int)HttpStatusCode.NotFound,
+                "Get Seminar Failed",
+                url);
 
-        return AppResponse<Seminar>.Success(semList?.FirstOrDefault(), "Operation successful.",
-            (int)responseWrapper.StatusCode, "Get Seminar Success", url);
+        return AppResponse<Seminar>.Success(
+            sem, "Operation successful.",
+            (int)HttpStatusCode.OK, "Get Seminar Success", url
+        );
     }
 
     // uses SOAP services
@@ -241,7 +248,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     public async Task<AppResponse<List<AvailableSeminar>>.BaseResponse> GetAvailableSeminars()
     {
         var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}";
-        url += FilterHelper.GenerateFilter("Status", "Open", true);
+        url += FilterHelper.GenerateOptionalFilter("Status", ["Open", "Closed"], true);
         var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
         if (!responseWrapper.IsSuccess)
@@ -250,7 +257,7 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         // extract available seminars
         JToken? tk = responseWrapper.Data?.value;
-        var availableSeminars = tk?.ToObject<List<AvailableSeminar>>();
+        List<AvailableSeminar>? availableSeminars = tk?.ToObject<List<AvailableSeminar>>();
 
         return AppResponse<List<AvailableSeminar>>.Success(availableSeminars, "Operation successful.",
             (int)HttpStatusCode.OK, "Get Available Seminars Success", url);
@@ -259,24 +266,35 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
     public async Task<AppResponse<AvailableSeminar>.BaseResponse> GetAvailableSeminar(string seminarNo)
     {
         var url = $"{Connection.BaseUri}{Connection.AvailableSeminarsPath}";
-        url += FilterHelper.GenerateFilter("No", seminarNo, true);
-        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+        try
+        {
+            url += FilterHelper.GenerateFilter("No", seminarNo, true);
+            url += FilterHelper.GenerateOptionalFilter("Status", ["Open", "Closed", "Canceled"], false);
+            var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
-        if (!responseWrapper.IsSuccess)
-            return AppResponse<AvailableSeminar>.Failure(responseWrapper.ErrorMessage, (int)responseWrapper.StatusCode,
-                "Get Available Seminar Failed", url);
+            if (!responseWrapper.IsSuccess)
+                return AppResponse<AvailableSeminar>.Failure(responseWrapper.ErrorMessage,
+                    (int)responseWrapper.StatusCode,
+                    "Get Available Seminar Failed", url);
 
-        // extract available seminar
-        // Use the format below
-        var result = responseWrapper.Data?.value.ToString();
-        var lst = JsonConvert.DeserializeObject<List<AvailableSeminar>>(result);
-        var availableSeminar = lst?.FirstOrDefault();
-        if (availableSeminar == null)
-            return AppResponse<AvailableSeminar>.Failure("Seminar not found.", (int)HttpStatusCode.NotFound,
-                "Get Available Seminar Failed", url);
+            // extract available seminar
+            // Use the format below
+            var result = responseWrapper.Data?.value.ToString();
+            List<AvailableSeminar>? lst = JsonConvert.DeserializeObject<List<AvailableSeminar>>(result);
+            var availableSeminar = lst?.FirstOrDefault();
+            if (availableSeminar == null)
+                return AppResponse<AvailableSeminar>.Failure("Seminar not found.", (int)HttpStatusCode.NotFound,
+                    "Get Available Seminar Failed", url);
 
-        return AppResponse<AvailableSeminar>.Success(availableSeminar, "Operation successful.", (int)HttpStatusCode.OK,
-            "Get Available Seminar Success", url);
+            return AppResponse<AvailableSeminar>.Success(availableSeminar, "Operation successful.",
+                (int)HttpStatusCode.OK,
+                "Get Available Seminar Success", url);
+        }
+        catch (Exception ex)
+        {
+            return AppResponse<AvailableSeminar>.Failure($"Err => {ex.Message}", (int)HttpStatusCode.InternalServerError,
+                "Update Seminar Failed", "__");
+        }
     }
 
     public async Task<AppResponse<SeminarRegistrationItem>.BaseResponse> CreateSeminarRegistration(string semNo,
@@ -308,7 +326,8 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
             "Create Seminar Registration Success", url);
     }
 
-    public async Task<AppResponse<SeminarRegistrationItem>.BaseResponse> UpdateSeminarRegistration(string semHeaderNo, int lineNo,
+    public async Task<AppResponse<SeminarRegistrationItem>.BaseResponse> UpdateSeminarRegistration(string semHeaderNo,
+        int lineNo,
         bool confirmed)
     {
         var functionName = "UpdateSeminarConfirmation";
@@ -323,7 +342,8 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         );
 
         if (!responseWrapper.IsSuccess)
-            return AppResponse<SeminarRegistrationItem>.Failure(responseWrapper.ErrorMessage, (int)responseWrapper.StatusCode,
+            return AppResponse<SeminarRegistrationItem>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
                 "Update Seminar Registration Failed", url);
 
         // extract registration response
@@ -331,27 +351,32 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         var regResponse = JsonConvert.DeserializeObject<SeminarRegistrationsResponseValue>(result);
         var registration = ExtractSeminarRegistrationFromResponseWrapper(regResponse);
 
-        return AppResponse<SeminarRegistrationItem>.Success(registration, regResponse.message ?? "Operation successful.",
+        return AppResponse<SeminarRegistrationItem>.Success(registration,
+            regResponse.message ?? "Operation successful.",
             (int)regResponse.status, "Update Seminar Registration Success", url);
     }
 
-    public async Task<AppResponse<List<SeminarRegistrationRespItem>>.BaseResponse> GetSeminarRegistrations(string participantContactNo, string? seminarNo="")
+    public async Task<AppResponse<List<SeminarRegistrationRespItem>>.BaseResponse> GetSeminarRegistrations(
+        string participantContactNo, string? seminarNo = "")
     {
         var url = $"{Connection.BaseUri}{Connection.SeminarRegistrationsPath}";
         url += FilterHelper.GenerateFilter("Participant_Contact_No", participantContactNo, true);
         if (!string.IsNullOrEmpty(seminarNo)) url += FilterHelper.GenerateFilter("Document_No", seminarNo);
-        
+
         var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
         if (!responseWrapper.IsSuccess)
-            return AppResponse<List<SeminarRegistrationRespItem>>.Failure(responseWrapper.ErrorMessage, (int)responseWrapper.StatusCode, "Get Seminar Registrations Failed", url);
+            return AppResponse<List<SeminarRegistrationRespItem>>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode, "Get Seminar Registrations Failed", url);
 
         // extract registration response
         JToken? tk = responseWrapper.Data?.value;
-        var registrationItems = tk?.ToObject<List<SemRegistrationODataItem>>();
-        var registrationRespItems = registrationItems?.Select(item => mapper.Map<SeminarRegistrationRespItem>(item)).ToList();
+        List<SemRegistrationODataItem>? registrationItems = tk?.ToObject<List<SemRegistrationODataItem>>();
+        var registrationRespItems =
+            registrationItems?.Select(item => mapper.Map<SeminarRegistrationRespItem>(item)).ToList();
 
-        return AppResponse<List<SeminarRegistrationRespItem>>.Success(registrationRespItems, "Operation successful.", (int)HttpStatusCode.OK, "Get Seminar Registrations Success", url);
+        return AppResponse<List<SeminarRegistrationRespItem>>.Success(registrationRespItems, "Operation successful.",
+            (int)HttpStatusCode.OK, "Get Seminar Registrations Success", url);
     }
 
     public async Task<AppResponse<List<GenProdPostingGroupDto>>.BaseResponse> GetGenProdPostingGroups()
@@ -365,9 +390,9 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         // extract GenProdPostingGroups
         JToken? tk = responseWrapper.Data?.value;
-        var genProdPostingGroups = tk?.ToObject<List<GenProdPostingGroupDto>>();
+        List<GenProdPostingGroupDto>? genProdPostingGroups = tk?.ToObject<List<GenProdPostingGroupDto>>();
 
-        return AppResponse<List<GenProdPostingGroupDto>>.Success(genProdPostingGroups, "Operation successful.",
+        return AppResponse<List<GenProdPostingGroupDto>>.Success(genProdPostingGroups ?? [], "Operation successful.",
             (int)HttpStatusCode.OK, "Get GenProd Posting Groups Success", url);
     }
 
@@ -382,9 +407,9 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         // extract VATProdPostingGroups
         JToken? tk = responseWrapper.Data?.value;
-        var vatProdPostingGroups = tk?.ToObject<List<VATProdPostingGroupDto>>();
+        List<VATProdPostingGroupDto>? vatProdPostingGroups = tk?.ToObject<List<VATProdPostingGroupDto>>();
 
-        return AppResponse<List<VATProdPostingGroupDto>>.Success(vatProdPostingGroups, "Operation successful.",
+        return AppResponse<List<VATProdPostingGroupDto>>.Success(vatProdPostingGroups ?? [], "Operation successful.",
             (int)HttpStatusCode.OK, "Get VAT Prod Posting Groups Success", url);
     }
 
@@ -404,9 +429,9 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         // extract contacts
         JToken? tk = responseWrapper.Data?.value;
-        var contacts = tk?.ToObject<List<Contact>>();
+        List<Contact>? contacts = tk?.ToObject<List<Contact>>();
 
-        return AppResponse<List<Contact>>.Success(contacts, "Operation successful.", (int)HttpStatusCode.OK,
+        return AppResponse<List<Contact>>.Success(contacts ?? [], "Operation successful.", (int)HttpStatusCode.OK,
             "Get Contacts Success", url);
     }
 
@@ -441,7 +466,8 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
         return new SeminarRegistrationItem();
     }
 
-    private SeminarRegistrationRespItem? ExtractSeminarRegistrationLineResponseWrapper(SeminarRegistrationsResponseValue? res)
+    private SeminarRegistrationRespItem? ExtractSeminarRegistrationLineResponseWrapper(
+        SeminarRegistrationsResponseValue? res)
     {
         if (res == null) return default;
         JToken? tk = res.data;
@@ -458,7 +484,6 @@ public class SeminarService(HttpClient httpClient, IConfiguration config, Creden
 
         return new SeminarRegistrationRespItem();
     }
-
 }
 
 public class Seminar
