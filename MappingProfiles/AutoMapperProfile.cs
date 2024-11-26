@@ -15,10 +15,8 @@ public class AutoMapperProfile : Profile
             // )
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
             .ForMember(dest => dest.IsActive, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.FullName, opt => opt.Ignore())
             .ForMember(dest => dest.Role, opt => opt.Ignore())
             .ForMember(dest => dest.PreviouslyDeleted, opt => opt.Ignore())
             ;
@@ -27,16 +25,15 @@ public class AutoMapperProfile : Profile
         CreateMap<User, NormalUserResponse>();
         CreateMap<User, ElevatedNormalUserResponse>();
 
-        CreateMap<UpdateUserRequest, User>()
-            .ForMember(dest => dest.FirstName, opt => opt.Condition(src => src.FirstName != null))
-            .ForMember(dest => dest.LastName, opt => opt.Condition(src => src.LastName != null))
-            .ForMember(dest => dest.Title, opt => opt.Condition(src => src.Title != null))
-            ;
+        CreateMap<UpdateUserRequest, User>();
 
         // Add mapping for SeminarRegistrationRespItem
         CreateMap<SemRegistrationODataItem, SeminarRegistrationRespItem>()
-            .ForMember(dest => dest.SeminarNo, opt => opt.MapFrom(src => src.Document_No))
+            .ForMember(dest => dest.SeminarNo, opt => opt.MapFrom(src => src.Seminar_No))
+            .ForMember(dest => dest.SeminarName, opt => opt.MapFrom(src => src.Seminar_Name))
+            .ForMember(dest => dest.StartingDate, opt => opt.MapFrom(src => src.Starting_Date))
             .ForMember(dest => dest.LineNo, opt => opt.MapFrom(src => src.Line_No))
+            .ForMember(dest => dest.HeaderNo, opt => opt.MapFrom(src => src.Header_No))
             .ForMember(dest => dest.CompanyNo, opt => opt.MapFrom(src => src.Bill_to_Customer_No))
             .ForMember(dest => dest.ParticipantContactNo, opt => opt.MapFrom(src => src.Participant_Contact_No))
             .ForMember(dest => dest.ParticipantName, opt => opt.MapFrom(src => src.Participant_Name))

@@ -1,190 +1,230 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using AutoMapper;
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
-using SeminarIntegration.Data;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SeminarIntegration.DTOs;
 using SeminarIntegration.Interfaces;
+using SeminarIntegration.Models;
+using SeminarIntegration.Utils;
 
 namespace SeminarIntegration.Services;
 
-public class UserService(UserDbContext context, ILogger<UserService> logger, IMapper mapper)
+public class UserService(HttpClient httpClient, IConfiguration config, Credentials credentials, IMapper mapper)
     : IUserService
 {
-    public async Task<IEnumerable<NormalUserResponse>> GetUsersAsync()
+    private readonly UrlHelper _urlHelper = new(config);
+
+    public async Task<AppResponse<List<NormalUserResponse>>.BaseResponse> GetUsersAsync()
     {
-        var users = await _fetchUsers(false);
+        var url = $"{Connection.BaseUri}{Connection.AppUserListPath}";
+        // url += FilterHelper.GenerateFilter("IsDeleted", "false", true); // TODO: Come back to this
 
-        var lst = users
-            .Select(u => mapper.Map<NormalUserResponse>(u))
-            .ToList();
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
 
-        return lst;
+        if (!responseWrapper.IsSuccess)
+            return AppResponse<List<NormalUserResponse>>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
+                "Get Users Failed", url);
+
+        // extract users
+        JToken? tk = responseWrapper.Data?.value;
+        var userList = tk?.ToObject<List<User>>();
+        var users = new List<NormalUserResponse>();
+        if (userList == null)
+            return AppResponse<List<NormalUserResponse>>.Success(users, "Operation successful.", (int)HttpStatusCode.OK,
+                "Get Seminars Success", url);
+
+        users.AddRange(userList.Select(mapper.Map<NormalUserResponse>));
+
+        return AppResponse<List<NormalUserResponse>>.Success(users, "Operation successful.", (int)HttpStatusCode.OK,
+            "Get Users Success", url);
     }
 
-    public async Task<IEnumerable<ElevatedNormalUserResponse>> GetAllUsersAsync()
+    public async Task<AppResponse<List<ElevatedNormalUserResponse>>.BaseResponse> GetAllUsersAsync()
     {
-        var users = await _fetchUsers(true);
-        var lst = users
-            .Select(u => mapper.Map<ElevatedNormalUserResponse>(u))
-            .ToList();
-        return lst;
+        var url = $"{Connection.BaseUri}{Connection.AppUserListPath}";
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+        if (!responseWrapper.IsSuccess)
+            return AppResponse<List<ElevatedNormalUserResponse>>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
+                "Get Users Failed", url);
+        // extract users
+        JToken? tk = responseWrapper.Data?.value;
+        var userList = tk?.ToObject<List<User>>();
+        var users = new List<ElevatedNormalUserResponse>();
+        if (userList == null)
+            return AppResponse<List<ElevatedNormalUserResponse>>.Success(users, "Operation successful.",
+                (int)HttpStatusCode.OK,
+                "Get Users Success", url);
+        users.AddRange(userList.Select(mapper.Map<ElevatedNormalUserResponse>));
+        return AppResponse<List<ElevatedNormalUserResponse>>.Success(users, "Operation successful.",
+            (int)HttpStatusCode.OK,
+            "Get Users Success", url);
     }
 
-    public async Task<NormalUserResponse> GetUser(string username)
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> GetUser(string username)
     {
-        var user = await context.Users
-            .Where(u => !u.IsDeleted)
-            .FirstOrDefaultAsync(u => u.Username == username);
-        if (user == null) throw new ValidationException("User not found");
-
-        return mapper.Map<NormalUserResponse>(user);
-    }
-
-    public async Task<NormalUserResponse> CreateUser(NewUserRequest newUserRequest)
-    {
-        User? user;
-        try
+        var url = $"{Connection.BaseUri}{Connection.AppUserListPath}";
+        url += FilterHelper.GenerateFilter("Username", username, true);
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+        if (!responseWrapper.IsSuccess)
+            return AppResponse<NormalUserResponse>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
+                "Get User Failed", url);
+        // extract users
+        // JToken? tk = responseWrapper.Data?.value;
+        // var userList = tk?.ToObject<List<User>>();
+        var result = responseWrapper.Data?.value.ToString();
+        List<User> userList = [];
+        foreach (var u in responseWrapper.Data?.value)
         {
-            if (
-                string.IsNullOrWhiteSpace(newUserRequest.Email) ||
-                string.IsNullOrWhiteSpace(newUserRequest.Password) ||
-                string.IsNullOrWhiteSpace(newUserRequest.Username) ||
-                string.IsNullOrWhiteSpace(newUserRequest.FirstName) ||
-                string.IsNullOrWhiteSpace(newUserRequest.LastName)
-            )
-                throw new ValidationException(
-                    "Email, password, username, first name, and last name are required fields.");
+           userList.Add(JsonConvert.DeserializeObject<User>(u.ToString())); 
+        }
+        if (userList.Count == 0)
+            return AppResponse<NormalUserResponse>.Failure("User not found", (int)HttpStatusCode.NotFound,
+                "Get User Failed", url);
+        var user = userList.FirstOrDefault();
+        if (user == null)
+            return AppResponse<NormalUserResponse>.Failure("User not found", (int)HttpStatusCode.NotFound,
+                "Get User Failed", url);
+        return AppResponse<NormalUserResponse>.Success(mapper.Map<NormalUserResponse>(user), "Operation successful.",
+            (int)HttpStatusCode.OK, "Get User Success", url);
+    }
 
-            var hashedPwd =
-                BCrypt.Net.BCrypt.EnhancedHashPassword(newUserRequest.Password, HashType.SHA384);
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> CreateUser(NewUserRequest newUserRequest)
+    {
+        if (
+            string.IsNullOrWhiteSpace(newUserRequest.Email) ||
+            string.IsNullOrWhiteSpace(newUserRequest.Password) ||
+            string.IsNullOrWhiteSpace(newUserRequest.Username) ||
+            string.IsNullOrWhiteSpace(newUserRequest.Name)
+        )
+            throw new ValidationException(
+                "Email, password, username, first name, and last name are required fields.");
 
-            // Check if a user with the same username or email exists and is deleted
-            user = await context.Users
-                .Where(u => u.Username == newUserRequest.Username || u.Email == newUserRequest.Email)
-                .FirstOrDefaultAsync();
+        var hashedPwd =
+            BCrypt.Net.BCrypt.EnhancedHashPassword(newUserRequest.Password, HashType.SHA384);
 
-            if (user != null)
+        var functionName = "CreateUser";
+        var url = _urlHelper.GenerateUnboundUrl(functionName);
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
+            new
             {
-                if (user.IsDeleted)
-                {
-                    // Reactivate the deleted user
-                    user.IsDeleted = false;
-                    user.DeletedAt = null;
-                    user.UpdatedAt = DateTime.UtcNow;
-                    user.Password = hashedPwd;
-                    user.FirstName = newUserRequest.FirstName;
-                    user.LastName = newUserRequest.LastName;
-                    user.Title = newUserRequest.Title;
-                    user.Email = newUserRequest.Email;
-                    user.PreviouslyDeleted = true; // Set PreviouslyDeleted flag
-                    context.Users.Update(user);
-                }
-                else
-                {
-                    throw new ValidationException("A user with the same username or email already exists.");
-                }
+                username = newUserRequest.Username,
+                password = hashedPwd,
+                email = newUserRequest.Email,
+                name = newUserRequest.Name
             }
-            else
+        );
+
+        if (!responseWrapper.IsSuccess)
+            return AppResponse<NormalUserResponse>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
+                "Create user Failed", url);
+
+        // extract user
+        UserResponseValue? semResponse =
+            JsonConvert.DeserializeObject<UserResponseValue>(responseWrapper.Data?.value);
+        var user = ExtractUserFromResponseWrapper(semResponse);
+        if (user == null)
+            return AppResponse<NormalUserResponse>.Failure("User not found", (int)HttpStatusCode.NotFound,
+                "Create user Failed", url);
+
+        var mappedUser = mapper.Map<NormalUserResponse>(user);
+        return AppResponse<NormalUserResponse>.Success(mappedUser, "Operation successful.",
+            (int)HttpStatusCode.OK, "Create user Success", url);
+    }
+
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> UpdateUser(string username, UpdateUserRequest updatedUser)
+    {
+        var url = $"{Connection.BaseUri}{Connection.AppUserListPath}";
+        url += FilterHelper.GenerateFilter("Username", username, true);
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
+            new
             {
-                // Proceed with creating a new user
-                user = mapper.Map<NewUserRequest, User>(newUserRequest);
-                user.Password = hashedPwd;
-                user.Title ??= "";
-                user.CreatedAt = DateTime.UtcNow;
-                context.Users.Add(user);
+                username,
+                name = updatedUser.Name,
             }
+        );
+        if (!responseWrapper.IsSuccess)
+            return AppResponse<NormalUserResponse>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
+                "Update user Failed", url);
 
-            await context.SaveChangesAsync();
-        }
-        catch (ValidationException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while creating the user.");
-            throw new Exception("An error occurred while creating the user.");
-        }
+        // extract user
+        JToken? tk = responseWrapper.Data?.value;
+        var user = tk?.ToObject<User>();
+        if (user == null)
+            return AppResponse<NormalUserResponse>.Failure("User not found", (int)HttpStatusCode.NotFound,
+                "Update user Failed", url);
 
-        return mapper.Map<NormalUserResponse>(user);
+        var mappedUser = mapper.Map<NormalUserResponse>(user);
+        return AppResponse<NormalUserResponse>.Success(mappedUser, "Operation successful.",
+            (int)HttpStatusCode.OK, "Update user Success", url);
     }
 
-    public async Task<NormalUserResponse> UpdateUser(string username, UpdateUserRequest updatedUser)
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> DeleteUser(string username)
     {
-        User? user;
-
-        try
-        {
-            user = await context.Users
-                .Where(u => !u.IsDeleted)
-                .FirstOrDefaultAsync(u => u.Username == username);
-            if (user == null) throw new ValidationException("User not found");
-
-            // Proceed
-            user = mapper.Map(updatedUser, user);
-            user.UpdatedAt = DateTime.UtcNow;
-            context.Users.Update(user);
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while updating the user.");
-            throw new Exception("An error occurred while updating the user.");
-        }
-
-        return mapper.Map<NormalUserResponse>(user);
-    }
-
-    public async Task<NormalUserResponse?> DeleteUser(string username)
-    {
-        try
-        {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (user == null)
-                throw new ValidationException("User not found");
-            if (user.IsDeleted) return default;
-
-            // Copy user record to DeletedUserHistory table
-            var deletedUserHistory = DeletedUserHistory.FromUser(user);
-            context.DeletedUserHistory.Add(deletedUserHistory);
-
-            // Mark user as deleted
-            user.IsDeleted = true;
-            user.DeletedAt = DateTime.UtcNow;
-            context.Users.Update(user);
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while deleting the user.");
-            throw new Exception("An error occurred while deleting the user.");
-        }
-
-        return default;
+        var url = $"{Connection.BaseUri}{Connection.AppUserListPath}";
+        url += FilterHelper.GenerateFilter("Username", username, true);
+        var responseWrapper = await HttpHelper.SendPostRequest<BcJsonResponse>(url,
+            new
+            {
+                username
+            }
+        );
+        if (!responseWrapper.IsSuccess)
+            return AppResponse<NormalUserResponse>.Failure(responseWrapper.ErrorMessage,
+                (int)responseWrapper.StatusCode,
+                "Delete user Failed", url);
+        // extract user
+        JToken? tk = responseWrapper.Data?.value;
+        var user = tk?.ToObject<User>();
+        if (user == null)
+            return AppResponse<NormalUserResponse>.Failure("User not found", (int)HttpStatusCode.NotFound,
+                "Delete user Failed", url);
+        var mappedUser = mapper.Map<NormalUserResponse>(user);
+        return AppResponse<NormalUserResponse>.Success(mappedUser, "Operation successful.",
+            (int)HttpStatusCode.OK, "Delete user Success", url);
     }
 
     // For auth
     public async Task<User?> GetUser(string username, string password)
     {
-        var user = await context.Users
-            .Where(u => !u.IsDeleted)
-            .FirstOrDefaultAsync(u => u.Username == username);
+        var url = $"{Connection.BaseUri}AuthList";
+        url += FilterHelper.GenerateFilter("Username", username, true);
+        var responseWrapper = await HttpHelper.SendGetRequest<BcJsonResponse>(url);
+        
+        if (!responseWrapper.IsSuccess)
+            return null;
+        
+        // extract users
+        JToken? tk = responseWrapper.Data?.value;
+        var userList = tk?.ToObject<List<User>>();
 
-        if (user == null) return default;
-
-        if (BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
-            return user;
-        return default;
+        var user = userList?.FirstOrDefault();
+        if (user == null)
+            return null;
+        
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
+            return null;
+        return user;
     }
 
-    private async Task<IEnumerable<User>> _fetchUsers(bool includeDeleted)
+    private User? ExtractUserFromResponseWrapper(UserResponseValue? res)
     {
-        var users = await context.Users
-            .Where(u => includeDeleted || !u.IsDeleted)
-            .ToListAsync();
-        if (users == null) throw new ValidationException("No users found");
-
-        return users;
+        if (res == null) return default;
+        JToken? tk = res.data;
+        return tk?.ToObject<User>() ?? default;
     }
+}
+
+public class UserResponseValue
+{
+    public int status { get; set; }
+    public string message { get; set; }
+    public dynamic? data { get; set; }
 }

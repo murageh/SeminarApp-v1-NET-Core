@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SeminarIntegration.DTOs;
 using SeminarIntegration.Interfaces;
+using SeminarIntegration.Models;
 using SeminarIntegration.Services;
 
 namespace SeminarIntegration.Controllers;
@@ -15,7 +18,7 @@ public class SeminarController(ISeminar seminar) : Controller
     [ActionName("allSeminars")]
     [EndpointDescription("Fetches all seminars")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetSeminars()
+    public async Task<IActionResult> GetSeminars()
     {
         var response = await seminar.GetSeminars();
         response.Path = HttpContext.Request.Path; 
@@ -26,7 +29,7 @@ public class SeminarController(ISeminar seminar) : Controller
     [ActionName("Seminar")]
     [EndpointDescription("Fetches a specific seminar")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetSeminar(string seminarNo)
+    public async Task<IActionResult> GetSeminar(string seminarNo)
     {
         var response = await seminar.GetSeminar(seminarNo);
         response.Path = HttpContext.Request.Path; 
@@ -37,7 +40,7 @@ public class SeminarController(ISeminar seminar) : Controller
     [ActionName("AvailableSeminars")]
     [EndpointDescription("Fetches all available seminars. fetches headers, as opposed to the previous methods.")]
     [Authorize(Policy = "User")]
-    public async Task<dynamic> GetAvailableSeminars()
+    public async Task<IActionResult> GetAvailableSeminars()
     {
         var response = await seminar.GetAvailableSeminars();
         response.Path = HttpContext.Request.Path; 
@@ -74,7 +77,7 @@ public class SeminarController(ISeminar seminar) : Controller
     public async Task<IActionResult> UpdateSeminarRegistration(SeminarUpdateDto reqDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var response = await seminar.UpdateSeminarRegistration(reqDto.SemNo, reqDto.LineNo, reqDto.Confirmed);
+        var response = await seminar.UpdateSeminarRegistration(reqDto.SemHeaderNo, reqDto.LineNo, reqDto.Confirmed);
         response.Path = HttpContext.Request.Path; 
         return StatusCode(response.StatusCode, response);
     }
@@ -85,6 +88,22 @@ public class SeminarController(ISeminar seminar) : Controller
     [Authorize(Policy = "User")]
     public async Task<IActionResult> GetMyRegistrations(string participantContactNo, string? seminarNo="")
     {
+        // var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+        // if (authHeader == null || !authHeader.StartsWith("Bearer "))
+        //     return StatusCode(StatusCodes.Status401Unauthorized, new AppResponse<NormalUserResponse>.ErrorResponse()
+        //     {
+        //         Title = "get My Registrations",
+        //         Message = "Invalid token.",
+        //         Path = HttpContext.Request.Path,
+        //         StatusCode = (int)HttpStatusCode.Unauthorized
+        //     });
+        //
+        // var token = authHeader.Substring("Bearer ".Length).Trim();
+        // var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
+        // var username = jwtToken?.Id;
+        //
+        // var user = userService.G
+
         var response = await seminar.GetSeminarRegistrations(participantContactNo, seminarNo);
         response.Path = HttpContext.Request.Path;
         return StatusCode(response.StatusCode, response);

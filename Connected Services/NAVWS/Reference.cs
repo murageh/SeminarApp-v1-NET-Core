@@ -16,6 +16,15 @@ namespace NAVWS
     public interface SeminarIntegration_Port
     {
         
+        // CODEGEN: Generating message contract since the wrapper name (CreateSeminarRegistration_Result) of message CreateSeminarRegistration_Result does not match the default value (CreateSeminarRegistration)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:CreateSeminarRegistrat" +
+            "ion", ReplyAction="*")]
+        NAVWS.CreateSeminarRegistration_Result CreateSeminarRegistration(NAVWS.CreateSeminarRegistration request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:CreateSeminarRegistrat" +
+            "ion", ReplyAction="*")]
+        System.Threading.Tasks.Task<NAVWS.CreateSeminarRegistration_Result> CreateSeminarRegistrationAsync(NAVWS.CreateSeminarRegistration request);
+        
         // CODEGEN: Generating message contract since the wrapper name (CreateSeminar_Result) of message CreateSeminar_Result does not match the default value (CreateSeminar)
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:CreateSeminar", ReplyAction="*")]
         NAVWS.CreateSeminar_Result CreateSeminar(NAVWS.CreateSeminar request);
@@ -31,6 +40,13 @@ namespace NAVWS
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:CreateSeminar_75957286" +
             "", ReplyAction="*")]
         System.Threading.Tasks.Task<NAVWS.CreateSeminar_75957286_Result> CreateSeminar_75957286Async(NAVWS.CreateSeminar_75957286 request);
+        
+        // CODEGEN: Generating message contract since the wrapper name (CreateUser_Result) of message CreateUser_Result does not match the default value (CreateUser)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:CreateUser", ReplyAction="*")]
+        NAVWS.CreateUser_Result CreateUser(NAVWS.CreateUser request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:CreateUser", ReplyAction="*")]
+        System.Threading.Tasks.Task<NAVWS.CreateUser_Result> CreateUserAsync(NAVWS.CreateUser request);
         
         // CODEGEN: Generating message contract since the wrapper name (DeleteSeminar_Result) of message DeleteSeminar_Result does not match the default value (DeleteSeminar)
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:DeleteSeminar", ReplyAction="*")]
@@ -53,6 +69,13 @@ namespace NAVWS
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:GetSeminars", ReplyAction="*")]
         System.Threading.Tasks.Task<NAVWS.GetSeminars_Result> GetSeminarsAsync(NAVWS.GetSeminars request);
         
+        // CODEGEN: Generating message contract since the wrapper name (LoginUser_Result) of message LoginUser_Result does not match the default value (LoginUser)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:LoginUser", ReplyAction="*")]
+        NAVWS.LoginUser_Result LoginUser(NAVWS.LoginUser request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:LoginUser", ReplyAction="*")]
+        System.Threading.Tasks.Task<NAVWS.LoginUser_Result> LoginUserAsync(NAVWS.LoginUser request);
+        
         // CODEGEN: Generating message contract since the wrapper name (RenameSeminar_Result) of message RenameSeminar_Result does not match the default value (RenameSeminar)
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:RenameSeminar", ReplyAction="*")]
         NAVWS.RenameSeminar_Result RenameSeminar(NAVWS.RenameSeminar request);
@@ -66,6 +89,15 @@ namespace NAVWS
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:TestProc", ReplyAction="*")]
         System.Threading.Tasks.Task<NAVWS.TestProc_Result> TestProcAsync(NAVWS.TestProc request);
+        
+        // CODEGEN: Generating message contract since the wrapper name (UpdateSeminarConfirmation_Result) of message UpdateSeminarConfirmation_Result does not match the default value (UpdateSeminarConfirmation)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:UpdateSeminarConfirmat" +
+            "ion", ReplyAction="*")]
+        NAVWS.UpdateSeminarConfirmation_Result UpdateSeminarConfirmation(NAVWS.UpdateSeminarConfirmation request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:UpdateSeminarConfirmat" +
+            "ion", ReplyAction="*")]
+        System.Threading.Tasks.Task<NAVWS.UpdateSeminarConfirmation_Result> UpdateSeminarConfirmationAsync(NAVWS.UpdateSeminarConfirmation request);
         
         // CODEGEN: Generating message contract since the wrapper name (UpdateSeminarWithGroups_Result) of message UpdateSeminarWithGroups_Result does not match the default value (UpdateSeminarWithGroups)
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:UpdateSeminarWithGroup" +
@@ -82,6 +114,65 @@ namespace NAVWS
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:UpdateSeminar", ReplyAction="*")]
         System.Threading.Tasks.Task<NAVWS.UpdateSeminar_Result> UpdateSeminarAsync(NAVWS.UpdateSeminar request);
+        
+        // CODEGEN: Generating message contract since the wrapper name (UpdateUser_Result) of message UpdateUser_Result does not match the default value (UpdateUser)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:UpdateUser", ReplyAction="*")]
+        NAVWS.UpdateUser_Result UpdateUser(NAVWS.UpdateUser request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration:UpdateUser", ReplyAction="*")]
+        System.Threading.Tasks.Task<NAVWS.UpdateUser_Result> UpdateUserAsync(NAVWS.UpdateUser request);
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CreateSeminarRegistration", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class CreateSeminarRegistration
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string semNo;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=1)]
+        public string companyNo;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=2)]
+        public string participantContactNo;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=3)]
+        public bool confirmed;
+        
+        public CreateSeminarRegistration()
+        {
+        }
+        
+        public CreateSeminarRegistration(string semNo, string companyNo, string participantContactNo, bool confirmed)
+        {
+            this.semNo = semNo;
+            this.companyNo = companyNo;
+            this.participantContactNo = participantContactNo;
+            this.confirmed = confirmed;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CreateSeminarRegistration_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class CreateSeminarRegistration_Result
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string return_value;
+        
+        public CreateSeminarRegistration_Result()
+        {
+        }
+        
+        public CreateSeminarRegistration_Result(string return_value)
+        {
+            this.return_value = return_value;
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -203,6 +294,58 @@ namespace NAVWS
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CreateUser", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class CreateUser
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string username;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=1)]
+        public string password;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=2)]
+        public string email;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=3)]
+        public string name;
+        
+        public CreateUser()
+        {
+        }
+        
+        public CreateUser(string username, string password, string email, string name)
+        {
+            this.username = username;
+            this.password = password;
+            this.email = email;
+            this.name = name;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CreateUser_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class CreateUser_Result
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string return_value;
+        
+        public CreateUser_Result()
+        {
+        }
+        
+        public CreateUser_Result(string return_value)
+        {
+            this.return_value = return_value;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(WrapperName="DeleteSeminar", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
     public partial class DeleteSeminar
     {
@@ -315,6 +458,50 @@ namespace NAVWS
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="LoginUser", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class LoginUser
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string username;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=1)]
+        public string password;
+        
+        public LoginUser()
+        {
+        }
+        
+        public LoginUser(string username, string password)
+        {
+            this.username = username;
+            this.password = password;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="LoginUser_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class LoginUser_Result
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string return_value;
+        
+        public LoginUser_Result()
+        {
+        }
+        
+        public LoginUser_Result(string return_value)
+        {
+            this.return_value = return_value;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(WrapperName="RenameSeminar", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
     public partial class RenameSeminar
     {
@@ -383,6 +570,54 @@ namespace NAVWS
         }
         
         public TestProc_Result(string return_value)
+        {
+            this.return_value = return_value;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="UpdateSeminarConfirmation", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class UpdateSeminarConfirmation
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string semNo;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=1)]
+        public int lineNo;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=2)]
+        public bool confirmed;
+        
+        public UpdateSeminarConfirmation()
+        {
+        }
+        
+        public UpdateSeminarConfirmation(string semNo, int lineNo, bool confirmed)
+        {
+            this.semNo = semNo;
+            this.lineNo = lineNo;
+            this.confirmed = confirmed;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="UpdateSeminarConfirmation_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class UpdateSeminarConfirmation_Result
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string return_value;
+        
+        public UpdateSeminarConfirmation_Result()
+        {
+        }
+        
+        public UpdateSeminarConfirmation_Result(string return_value)
         {
             this.return_value = return_value;
         }
@@ -500,6 +735,50 @@ namespace NAVWS
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="UpdateUser", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class UpdateUser
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string username;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=1)]
+        public string name;
+        
+        public UpdateUser()
+        {
+        }
+        
+        public UpdateUser(string username, string name)
+        {
+            this.username = username;
+            this.name = name;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="UpdateUser_Result", WrapperNamespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", IsWrapped=true)]
+    public partial class UpdateUser_Result
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:microsoft-dynamics-schemas/codeunit/SeminarIntegration", Order=0)]
+        public string return_value;
+        
+        public UpdateUser_Result()
+        {
+        }
+        
+        public UpdateUser_Result(string return_value)
+        {
+            this.return_value = return_value;
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     public interface SeminarIntegration_PortChannel : NAVWS.SeminarIntegration_Port, System.ServiceModel.IClientChannel
     {
@@ -548,6 +827,39 @@ namespace NAVWS
         public SeminarIntegration_PortClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress)
         {
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        NAVWS.CreateSeminarRegistration_Result NAVWS.SeminarIntegration_Port.CreateSeminarRegistration(NAVWS.CreateSeminarRegistration request)
+        {
+            return base.Channel.CreateSeminarRegistration(request);
+        }
+        
+        public string CreateSeminarRegistration(string semNo, string companyNo, string participantContactNo, bool confirmed)
+        {
+            NAVWS.CreateSeminarRegistration inValue = new NAVWS.CreateSeminarRegistration();
+            inValue.semNo = semNo;
+            inValue.companyNo = companyNo;
+            inValue.participantContactNo = participantContactNo;
+            inValue.confirmed = confirmed;
+            NAVWS.CreateSeminarRegistration_Result retVal = ((NAVWS.SeminarIntegration_Port)(this)).CreateSeminarRegistration(inValue);
+            return retVal.return_value;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<NAVWS.CreateSeminarRegistration_Result> NAVWS.SeminarIntegration_Port.CreateSeminarRegistrationAsync(NAVWS.CreateSeminarRegistration request)
+        {
+            return base.Channel.CreateSeminarRegistrationAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<NAVWS.CreateSeminarRegistration_Result> CreateSeminarRegistrationAsync(string semNo, string companyNo, string participantContactNo, bool confirmed)
+        {
+            NAVWS.CreateSeminarRegistration inValue = new NAVWS.CreateSeminarRegistration();
+            inValue.semNo = semNo;
+            inValue.companyNo = companyNo;
+            inValue.participantContactNo = participantContactNo;
+            inValue.confirmed = confirmed;
+            return ((NAVWS.SeminarIntegration_Port)(this)).CreateSeminarRegistrationAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -620,6 +932,39 @@ namespace NAVWS
             inValue.genProdPostingGroup = genProdPostingGroup;
             inValue.vATProdPostingGroup = vATProdPostingGroup;
             return ((NAVWS.SeminarIntegration_Port)(this)).CreateSeminar_75957286Async(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        NAVWS.CreateUser_Result NAVWS.SeminarIntegration_Port.CreateUser(NAVWS.CreateUser request)
+        {
+            return base.Channel.CreateUser(request);
+        }
+        
+        public string CreateUser(string username, string password, string email, string name)
+        {
+            NAVWS.CreateUser inValue = new NAVWS.CreateUser();
+            inValue.username = username;
+            inValue.password = password;
+            inValue.email = email;
+            inValue.name = name;
+            NAVWS.CreateUser_Result retVal = ((NAVWS.SeminarIntegration_Port)(this)).CreateUser(inValue);
+            return retVal.return_value;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<NAVWS.CreateUser_Result> NAVWS.SeminarIntegration_Port.CreateUserAsync(NAVWS.CreateUser request)
+        {
+            return base.Channel.CreateUserAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<NAVWS.CreateUser_Result> CreateUserAsync(string username, string password, string email, string name)
+        {
+            NAVWS.CreateUser inValue = new NAVWS.CreateUser();
+            inValue.username = username;
+            inValue.password = password;
+            inValue.email = email;
+            inValue.name = name;
+            return ((NAVWS.SeminarIntegration_Port)(this)).CreateUserAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -702,6 +1047,35 @@ namespace NAVWS
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        NAVWS.LoginUser_Result NAVWS.SeminarIntegration_Port.LoginUser(NAVWS.LoginUser request)
+        {
+            return base.Channel.LoginUser(request);
+        }
+        
+        public string LoginUser(string username, string password)
+        {
+            NAVWS.LoginUser inValue = new NAVWS.LoginUser();
+            inValue.username = username;
+            inValue.password = password;
+            NAVWS.LoginUser_Result retVal = ((NAVWS.SeminarIntegration_Port)(this)).LoginUser(inValue);
+            return retVal.return_value;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<NAVWS.LoginUser_Result> NAVWS.SeminarIntegration_Port.LoginUserAsync(NAVWS.LoginUser request)
+        {
+            return base.Channel.LoginUserAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<NAVWS.LoginUser_Result> LoginUserAsync(string username, string password)
+        {
+            NAVWS.LoginUser inValue = new NAVWS.LoginUser();
+            inValue.username = username;
+            inValue.password = password;
+            return ((NAVWS.SeminarIntegration_Port)(this)).LoginUserAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         NAVWS.RenameSeminar_Result NAVWS.SeminarIntegration_Port.RenameSeminar(NAVWS.RenameSeminar request)
         {
             return base.Channel.RenameSeminar(request);
@@ -756,6 +1130,37 @@ namespace NAVWS
         {
             NAVWS.TestProc inValue = new NAVWS.TestProc();
             return ((NAVWS.SeminarIntegration_Port)(this)).TestProcAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        NAVWS.UpdateSeminarConfirmation_Result NAVWS.SeminarIntegration_Port.UpdateSeminarConfirmation(NAVWS.UpdateSeminarConfirmation request)
+        {
+            return base.Channel.UpdateSeminarConfirmation(request);
+        }
+        
+        public string UpdateSeminarConfirmation(string semNo, int lineNo, bool confirmed)
+        {
+            NAVWS.UpdateSeminarConfirmation inValue = new NAVWS.UpdateSeminarConfirmation();
+            inValue.semNo = semNo;
+            inValue.lineNo = lineNo;
+            inValue.confirmed = confirmed;
+            NAVWS.UpdateSeminarConfirmation_Result retVal = ((NAVWS.SeminarIntegration_Port)(this)).UpdateSeminarConfirmation(inValue);
+            return retVal.return_value;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<NAVWS.UpdateSeminarConfirmation_Result> NAVWS.SeminarIntegration_Port.UpdateSeminarConfirmationAsync(NAVWS.UpdateSeminarConfirmation request)
+        {
+            return base.Channel.UpdateSeminarConfirmationAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<NAVWS.UpdateSeminarConfirmation_Result> UpdateSeminarConfirmationAsync(string semNo, int lineNo, bool confirmed)
+        {
+            NAVWS.UpdateSeminarConfirmation inValue = new NAVWS.UpdateSeminarConfirmation();
+            inValue.semNo = semNo;
+            inValue.lineNo = lineNo;
+            inValue.confirmed = confirmed;
+            return ((NAVWS.SeminarIntegration_Port)(this)).UpdateSeminarConfirmationAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -826,6 +1231,35 @@ namespace NAVWS
             inValue.seminarDuration = seminarDuration;
             inValue.seminarPrice = seminarPrice;
             return ((NAVWS.SeminarIntegration_Port)(this)).UpdateSeminarAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        NAVWS.UpdateUser_Result NAVWS.SeminarIntegration_Port.UpdateUser(NAVWS.UpdateUser request)
+        {
+            return base.Channel.UpdateUser(request);
+        }
+        
+        public string UpdateUser(string username, string name)
+        {
+            NAVWS.UpdateUser inValue = new NAVWS.UpdateUser();
+            inValue.username = username;
+            inValue.name = name;
+            NAVWS.UpdateUser_Result retVal = ((NAVWS.SeminarIntegration_Port)(this)).UpdateUser(inValue);
+            return retVal.return_value;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<NAVWS.UpdateUser_Result> NAVWS.SeminarIntegration_Port.UpdateUserAsync(NAVWS.UpdateUser request)
+        {
+            return base.Channel.UpdateUserAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<NAVWS.UpdateUser_Result> UpdateUserAsync(string username, string name)
+        {
+            NAVWS.UpdateUser inValue = new NAVWS.UpdateUser();
+            inValue.username = username;
+            inValue.name = name;
+            return ((NAVWS.SeminarIntegration_Port)(this)).UpdateUserAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

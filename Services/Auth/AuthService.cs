@@ -1,20 +1,20 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SeminarIntegration.Data;
 using SeminarIntegration.DTOs;
 using SeminarIntegration.DTOs.Authentication;
 using SeminarIntegration.Interfaces;
+using SeminarIntegration.Models;
 using SeminarIntegration.Utils;
 
 namespace SeminarIntegration.Services.Auth;
 
 public class AuthService(
-    UserDbContext context,
     ILogger<UserService> logger,
     IMapper mapper,
     IConfiguration config,
@@ -50,27 +50,41 @@ public class AuthService(
         return tokenHandler.WriteToken(token);
     }
 
-    public async Task<AuthDTOs.TokenResponse> AuthenticateUserAndReturnToken(string username, string password)
+    public async Task<AppResponse<AuthDTOs.TokenResponse>.BaseResponse> AuthenticateUserAndReturnToken(string username, string password)
     {
         var user = await userService.GetUser(username, password);
-        if (user == null) throw new InvalidCredentialException("Invalid username or password");
+        if (user == null)
+            return new AppResponse<AuthDTOs.TokenResponse>.ErrorResponse()
+            {
+                Title = "Login",
+                Message = "Invalid username or password.",
+                Path = "/api/auth/login",
+                StatusCode = (int)HttpStatusCode.Unauthorized
+            };
 
         var token = GenerateToken(user);
-        return new AuthDTOs.TokenResponse
+        return new AppResponse<AuthDTOs.TokenResponse>.SuccessResponse()
         {
-            Token = token,
-            IssuedAt = DateTime.UtcNow,
-            ExpiresIn = ExpiresInSeconds,
-            RefreshToken = ""
+            Data = new AuthDTOs.TokenResponse
+            {
+                Token = token,
+                IssuedAt = DateTime.UtcNow,
+                ExpiresIn = ExpiresInSeconds,
+                RefreshToken = ""
+            },
+            Title = "Login",
+            Message = "Login successful.",
+            Path = "/api/auth/login",
+            StatusCode = (int)HttpStatusCode.OK
         };
     }
 
-    public async Task<NormalUserResponse> RegisterUser(NewUserRequest newUserRequest)
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> RegisterUser(NewUserRequest newUserRequest)
     {
         return await userService.CreateUser(newUserRequest);
     }
 
-    public async Task<NormalUserResponse> GetUserProfile(string username)
+    public async Task<AppResponse<NormalUserResponse>.BaseResponse> GetUserProfile(string username)
     {
         return await userService.GetUser(username);
     }

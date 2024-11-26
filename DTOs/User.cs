@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace SeminarIntegration.DTOs;
 
@@ -7,41 +8,26 @@ public class User
     /// <summary>
     ///     The user class will be used by end-users to access the system.
     ///     Authentication and authorization will be implemented using/from this class
+    ///     UPDATE(20/11/2024): This User model will now be from Microsoft Dynamics BC
     /// </summary>
-    public User(string username,
-        string password,
-        string email,
-        string firstName,
-        string lastName,
-        string? title
-    )
-    {
-        Username = username;
-        Password = password;
-        Email = email;
-        Title = title ?? "";
-        FirstName = firstName;
-        LastName = lastName;
-        Role = "user";
-    }
-
-    [Key] public string Uuid { get; set; } = Guid.NewGuid().ToString("B").ToUpper();
+    public string Uuid { get; set; }
+    [JsonProperty("Name")]
+    public dynamic Name { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
     public string Email { get; set; }
-    public string Title { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
-    public bool IsDeleted { get; set; } = false;
+    public string CreatedAt { get; set; }
+    public string UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
-    public DateTime? DeletedAt { get; set; }
+    public string? DeletedAt { get; set; }
     public bool PreviouslyDeleted { get; set; }
 
-    public string FullName => $"{FirstName} {LastName}";
-
     public string Role { get; set; }
+
+    public string Customer_No { get; set; }
+    public string Customer_Name { get; set; }
+    public string Contact_No { get; set; }
+    public string Contact_Name { get; set; }
 
     // Util methods
     public bool IsAdmin()
@@ -69,10 +55,8 @@ public class NewUserRequest
 
     [Required] [StringLength(250)] public string Password { get; set; }
     [Required] [EmailAddress] public string Email { get; set; }
-    [Required] [StringLength(30)] public string FirstName { get; set; }
-    [Required] [StringLength(30)] public string LastName { get; set; }
+    [Required] [StringLength(30)] public string Name { get; set; }
 
-    [StringLength(10)] public string? Title { get; set; }
     // [Required]
     // [AllowedValues(new string[] { "admin", "user", "guest" })]
     // public string? Role { get; set; }
@@ -84,19 +68,20 @@ public class NormalUserResponse
     public string Uuid { get; set; }
     public string Username { get; set; }
     public string Email { get; set; }
-    public string? Title { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string Name { get; set; }
     public string Role { get; set; }
+    public string Customer_No { get; set; }
+    public string Customer_Name { get; set; }
+    public string Contact_No { get; set; }
+    public string Contact_Name { get; set; }
 }
 
 public class ElevatedNormalUserResponse : NormalUserResponse
 {
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
-    public bool IsDeleted { get; set; } = false;
+    public string CreatedAt { get; set; }
+    public string UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
-    public DateTime? DeletedAt { get; set; }
+    public string? DeletedAt { get; set; }
     public bool PreviouslyDeleted { get; set; }
 }
 
@@ -107,9 +92,7 @@ public class NewUserResponse : NormalUserResponse
 
 public class UpdateUserRequest
 {
-    [StringLength(10)] public string? Title { get; set; }
-    [StringLength(30)] public string? FirstName { get; set; }
-    [StringLength(30)] public string? LastName { get; set; }
+    [StringLength(30)] public string? Name { get; set; }
 }
 
 public class UpdateEmailRequest
@@ -147,10 +130,8 @@ public class DeletedUserHistory
     public string Uuid { get; set; }
     public string Username { get; set; }
     public string Email { get; set; }
-    public string? Title { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public DateTime DeletedAt { get; set; }
+    public string Name { get; set; }
+    public string DeletedAt { get; set; }
 
 
     // factory method extract details from user. Accepts a user object
@@ -162,10 +143,8 @@ public class DeletedUserHistory
             Uuid = user.Uuid,
             Username = user.Username,
             Email = user.Email,
-            Title = user.Title,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            DeletedAt = DateTime.UtcNow
+            Name = user.Name, 
+            DeletedAt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
         };
     }
 }

@@ -37,13 +37,9 @@ public class UserController(IUserService userService) : Controller
     [Authorize(Policy = "User")]
     public async Task<IActionResult> GetUsers()
     {
-        return await _helpers.HandleRequestAsync(
-            () => userService.GetUsersAsync(),
-            "Finding users",
-            "Users found successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var response = await userService.GetUsersAsync();
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("all")]
@@ -52,13 +48,9 @@ public class UserController(IUserService userService) : Controller
     [Authorize(Policy = "User")] // TODO: Change to Admin or elevated User
     public async Task<IActionResult> GetAllUsers()
     {
-        return await _helpers.HandleRequestAsync(
-            userService.GetAllUsersAsync,
-            "Finding users",
-            "Users found successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var response = await userService.GetAllUsersAsync();
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("{username}")]
@@ -67,13 +59,9 @@ public class UserController(IUserService userService) : Controller
     [Authorize(Policy = "User")]
     public async Task<IActionResult> GetUser(string username)
     {
-        return await _helpers.HandleRequestAsync(
-            () => userService.GetUser(username),
-            "Finding user",
-            "User found successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var response = await userService.GetUser(username);
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPatch("{username}")]
@@ -84,13 +72,9 @@ public class UserController(IUserService userService) : Controller
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        return await _helpers.HandleRequestAsync(
-            () => userService.UpdateUser(username, updatedUser),
-            "Updating user",
-            "User updated successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var response = await userService.UpdateUser(username, updatedUser);
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpDelete("{username}")]
@@ -99,12 +83,8 @@ public class UserController(IUserService userService) : Controller
     [Authorize(Policy = "User")]
     public async Task<IActionResult> DeleteUser(string username)
     {
-        return await _helpers.HandleRequestAsync(
-            () => userService.DeleteUser(username),
-            "Deleting user",
-            "User deleted successfully.",
-            200,
-            HttpContext.Request.Path
-        );
+        var response = await userService.DeleteUser(username);
+        response.Path = HttpContext.Request.Path;
+        return StatusCode(response.StatusCode, response);
     }
 }
